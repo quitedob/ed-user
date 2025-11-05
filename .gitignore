@@ -18,6 +18,7 @@ tmp*
 .claude/
 .vscode/
 .cursor/
+.nuxt/
 .kiro/
 trial*/
 dist/
