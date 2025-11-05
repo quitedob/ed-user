@@ -21,16 +21,107 @@
         <div class="content-display">
           <!-- 视频播放器 -->
           <div v-if="sectionInfo.type === 'video'" class="video-container">
-            <video
-              ref="videoPlayer"
-              :src="sectionInfo.videoUrl"
-              :poster="sectionInfo.cover"
-              controls
-              @timeupdate="onVideoProgress"
+            <VideoPlayer
+              :videoId="sectionInfo.id"
+              :title="sectionInfo.title"
+              :description="sectionInfo.description"
+              :videoSrc="sectionInfo.videoUrl"
+              :thumbnail="sectionInfo.cover"
+              :duration="sectionInfo.durationInSeconds"
+              :subtitles="sectionInfo.subtitles"
+              :coursewareSync="sectionInfo.coursewareSync"
+              @play="onVideoPlay"
+              @pause="onVideoPause"
               @ended="onVideoComplete"
-            >
-              您的浏览器不支持视频播放
-            </video>
+              @progress="onVideoProgress"
+              @coursewareSync="onCoursewareSync"
+            />
+
+            <!-- 学习工具栏 -->
+            <div class="learning-toolbar">
+              <!-- AI助教快捷菜单 -->
+              <div class="toolbar-section ai-assistant-section">
+                <el-popover
+                  placement="top"
+                  :width="320"
+                  trigger="click"
+                  title="AI学习助手"
+                >
+                  <template #reference>
+                    <el-button type="primary" size="small" :icon="ChatLineSquare">
+                      AI助手
+                    </el-button>
+                  </template>
+                  <div class="ai-shortcuts">
+                    <div class="shortcuts-header">快速提问</div>
+                    <div class="shortcuts-list">
+                      <el-button
+                        v-for="question in aiQuickQuestions"
+                        :key="question.id"
+                        size="small"
+                        text
+                        class="shortcut-btn"
+                        @click="askAI(question.text)"
+                      >
+                        {{ question.text }}
+                      </el-button>
+                    </div>
+                  </div>
+                </el-popover>
+              </div>
+
+              <!-- 笔记工具 -->
+              <div class="toolbar-section notes-section">
+                <el-button
+                  size="small"
+                  :icon="EditPen"
+                  @click="openNoteDialog"
+                >
+                  {{ currentTimeNote ? '编辑笔记' : '记笔记' }}
+                </el-button>
+              </div>
+
+              <!-- 学习进度指示器 -->
+              <div class="toolbar-section progress-section">
+                <div class="progress-indicator">
+                  <el-progress
+                    :percentage="Math.round(sectionInfo.progress)"
+                    :show-text="false"
+                    :stroke-width="4"
+                  />
+                  <span class="progress-text">{{ Math.round(sectionInfo.progress) }}%</span>
+                </div>
+              </div>
+
+              <!-- 课件切换 -->
+              <div class="toolbar-section courseware-section" v-if="sectionInfo.coursewareSync">
+                <el-dropdown @command="switchCoursewarePage">
+                  <el-button size="small" :icon="Document">
+                    课件 ({{ currentCoursewarePage || 1 }}/{{ sectionInfo.coursewareSync.pages.length }})
+                  </el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item
+                        v-for="page in sectionInfo.coursewareSync.pages"
+                        :key="page.pageNumber"
+                        :command="page.pageNumber"
+                        :class="{ active: currentCoursewarePage === page.pageNumber }"
+                      >
+                        第{{ page.pageNumber }}页 - {{ page.title }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+
+              <!-- 学习时长统计 -->
+              <div class="toolbar-section time-section">
+                <div class="time-stats">
+                  <el-icon><Timer /></el-icon>
+                  <span>学习时长: {{ formatLearningTime(totalLearningTime) }}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- PDF查看器 -->
@@ -164,8 +255,13 @@
 import {
   ArrowLeft,
   Check,
-  Close
+  Close,
+  ChatLineSquare,
+  EditPen,
+  Document,
+  Timer
 } from '@element-plus/icons-vue'
+import VideoPlayer from '~/components/Course/VideoPlayer.vue'
 
 definePageMeta({
   title: '课程学习',
@@ -188,6 +284,22 @@ const videoPlayer = ref(null)
 const selectedOption = ref(null)
 const showAnswer = ref(false)
 const isCorrect = ref(false)
+
+// 学习工具栏相关状态
+const aiQuickQuestions = ref([
+  { id: 1, text: '这个概念是什么意思？' },
+  { id: 2, text: '能举个例子说明吗？' },
+  { id: 3, text: '这个知识点如何应用？' },
+  { id: 4, text: '相关的重点是什么？' }
+])
+
+const totalLearningTime = ref(0)
+const currentTimeNote = ref(null)
+const currentCoursewarePage = ref(null)
+const learningSessionStart = ref(null)
+
+// 学习时长定时器
+let learningTimer = null
 
 // 课程信息
 const courseInfo = ref({
@@ -331,6 +443,78 @@ const findSectionById = (targetSectionId) => {
   return null
 }
 
+// 学习工具栏相关方法
+const askAI = (question) => {
+  // 打开AI助教并预设问题
+  ElMessage.info(`AI助手: ${question}`)
+  // 这里可以调用AI助教组件的方法
+}
+
+const openNoteDialog = () => {
+  if (currentTimeNote.value) {
+    // 编辑现有笔记
+    ElMessage.info('编辑笔记功能待实现')
+  } else {
+    // 创建新笔记
+    ElMessage.info('创建笔记功能待实现')
+  }
+}
+
+const switchCoursewarePage = (pageNumber) => {
+  currentCoursewarePage.value = pageNumber
+  ElMessage.info(`切换到课件第${pageNumber}页`)
+  // 这里可以实现课件页面切换逻辑
+}
+
+const formatLearningTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = seconds % 60
+
+  if (hours > 0) {
+    return `${hours}小时${minutes}分钟`
+  } else if (minutes > 0) {
+    return `${minutes}分钟${secs}秒`
+  } else {
+    return `${secs}秒`
+  }
+}
+
+// 视频事件处理
+const onVideoPlay = () => {
+  if (!learningSessionStart.value) {
+    learningSessionStart.value = Date.now()
+    startLearningTimer()
+  }
+}
+
+const onVideoPause = () => {
+  stopLearningTimer()
+}
+
+
+const onCoursewareSync = (data) => {
+  if (data.type === 'pageChange') {
+    currentCoursewarePage.value = data.pageNumber
+    ElMessage.info(`课件同步: 第${data.pageNumber}页 - ${data.pageData.title}`)
+  }
+}
+
+// 学习时长统计
+const startLearningTimer = () => {
+  stopLearningTimer() // 确保没有重复的定时器
+  learningTimer = setInterval(() => {
+    totalLearningTime.value++
+  }, 1000)
+}
+
+const stopLearningTimer = () => {
+  if (learningTimer) {
+    clearInterval(learningTimer)
+    learningTimer = null
+  }
+}
+
 // 加载数据
 const loadData = async () => {
   // 模拟课程数据
@@ -391,41 +575,153 @@ const loadSectionData = () => {
       title: '软件工程的基本概念',
       chapterTitle: '第一章 软件工程概述',
       type: 'video',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      videoUrl: '/sample.mp4',
       cover: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800',
       duration: '45分钟',
+      durationInSeconds: 2700,
       progress: 0,
-      completed: true
+      completed: true,
+      description: '介绍软件工程的基本概念、发展历程和核心原则',
+      // 字幕数据
+      subtitles: [
+        {
+          id: 'zh',
+          label: '中文字幕',
+          language: 'zh',
+          data: [
+            { start: 5, end: 8, text: '欢迎使用软件工程课程' },
+            { start: 10, end: 15, text: '今天我们将学习软件工程的基本概念' },
+            { start: 16, end: 22, text: '软件工程是应用系统化、严格化、可量化的方法' },
+            { start: 23, end: 28, text: '来开发和维护软件的工程学科' },
+            { start: 30, end: 35, text: '它涵盖了软件的整个生命周期' },
+            { start: 36, end: 42, text: '从需求分析到系统维护的全过程' },
+            { start: 44, end: 50, text: '理解软件工程对于现代软件开发至关重要' }
+          ]
+        },
+        {
+          id: 'en',
+          label: 'English Subtitles',
+          language: 'en',
+          data: [
+            { start: 5, end: 8, text: 'Welcome to Software Engineering course' },
+            { start: 10, end: 15, text: 'Today we will learn the basic concepts of software engineering' },
+            { start: 16, end: 22, text: 'Software engineering applies systematic, disciplined, quantifiable approaches' },
+            { start: 23, end: 28, text: 'to the development and maintenance of software' },
+            { start: 30, end: 35, text: 'It covers the entire software lifecycle' },
+            { start: 36, end: 42, text: 'From requirements analysis to system maintenance' },
+            { start: 44, end: 50, text: 'Understanding software engineering is crucial for modern software development' }
+          ]
+        }
+      ],
+      // 课件同步数据
+      coursewareSync: {
+        enabled: true,
+        pages: [
+          {
+            pageNumber: 1,
+            startTime: 0,
+            endTime: 180,
+            title: '课程封面',
+            content: '软件工程导论 - 第一章',
+            preview: '/api/courseware/1/preview'
+          },
+          {
+            pageNumber: 2,
+            startTime: 180,
+            endTime: 600,
+            title: '软件工程定义',
+            content: '软件工程的定义和特征',
+            preview: '/api/courseware/2/preview'
+          },
+          {
+            pageNumber: 3,
+            startTime: 600,
+            endTime: 1200,
+            title: '生命周期模型',
+            content: '瀑布模型、螺旋模型、敏捷开发',
+            preview: '/api/courseware/3/preview'
+          },
+          {
+            pageNumber: 4,
+            startTime: 1200,
+            endTime: 1800,
+            title: '核心原则',
+            content: '模块化、抽象化、信息隐藏',
+            preview: '/api/courseware/4/preview'
+          },
+          {
+            pageNumber: 5,
+            startTime: 1800,
+            endTime: 2700,
+            title: '课程总结',
+            content: '关键知识点回顾和思考题',
+            preview: '/api/courseware/5/preview'
+          }
+        ]
+      }
     },
     2: {
       title: '软件生命周期模型',
       chapterTitle: '第一章 软件工程概述',
-      type: 'pdf',
-      pdfUrl: 'https://example.com/sample.pdf',
+      type: 'text',
+      content: `
+        <h2>软件生命周期模型</h2>
+        <p>软件生命周期模型是软件工程中的重要概念，它描述了软件从需求分析到维护的全过程。</p>
+
+        <h3>主要生命周期模型</h3>
+        <ol>
+          <li><strong>瀑布模型</strong>：线性顺序的开发过程，每个阶段完成后才能进入下一阶段</li>
+          <li><strong>螺旋模型</strong>：结合了瀑布模型和原型法的优点，强调风险分析</li>
+          <li><strong>增量模型</strong>：将软件系统分解为多个增量，每个增量都是一个可运行的软件子集</li>
+          <li><strong>敏捷开发</strong>：强调适应性和快速响应变化，代表方法有Scrum、XP等</li>
+        </ol>
+
+        <h3>模型选择原则</h3>
+        <ul>
+          <li>根据项目规模和复杂度选择合适的模型</li>
+          <li>考虑团队经验和客户需求</li>
+          <li>评估项目风险和不确定性</li>
+          <li>考虑交付时间和质量要求</li>
+        </ul>
+
+        <p>理解和选择合适的生命周期模型是软件项目成功的关键。</p>
+      `,
       duration: '60分钟',
       progress: 0,
-      completed: true
+      completed: true,
+      description: '介绍软件生命周期的各种模型和选择原则'
     },
     3: {
-      title: '需求获取',
+      title: '需求获取方法',
       chapterTitle: '第二章 需求分析',
       type: 'text',
       content: `
-        <h2>软件生命周期</h2>
-        <p>软件生命周期（Software Life Cycle）是软件从开始规划到最终废弃的整个过程。</p>
-        <h3>主要阶段</h3>
+        <h2>需求获取方法</h2>
+        <p>需求获取是软件工程中至关重要的第一步，它决定了整个项目的成败。</p>
+
+        <h3>主要获取方法</h3>
         <ol>
-          <li><strong>需求分析</strong>：确定软件系统的功能和性能需求</li>
-          <li><strong>系统设计</strong>：设计软件的架构和模块</li>
-          <li><strong>编码实现</strong>：根据设计文档编写代码</li>
-          <li><strong>测试</strong>：验证软件是否满足需求</li>
-          <li><strong>维护</strong>：修复缺陷和添加新功能</li>
+          <li><strong>访谈法</strong>：与用户、利益相关者进行深入交流</li>
+          <li><strong>问卷调查</strong>：大规模收集用户需求和偏好</li>
+          <li><strong>观察法</strong>：实地观察用户工作流程和操作习惯</li>
+          <li><strong>文档分析</strong>：研究现有文档和业务流程</li>
+          <li><strong>原型法</strong>：通过原型快速获取用户反馈</li>
         </ol>
-        <p>理解软件生命周期对于软件工程实践至关重要。</p>
+
+        <h3>最佳实践</h3>
+        <ul>
+          <li>多角度、多渠道获取需求</li>
+          <li>注重用户隐性需求的挖掘</li>
+          <li>建立持续的需求反馈机制</li>
+          <li>使用标准化的需求文档模板</li>
+        </ul>
+
+        <p>掌握有效的需求获取方法，是软件工程师的核心技能之一。</p>
       `,
       duration: '50分钟',
       progress: 0,
-      completed: true
+      completed: true,
+      description: '详细介绍软件需求获取的各种方法和最佳实践'
     },
     4: {
       title: '需求分析',
@@ -448,20 +744,100 @@ const loadSectionData = () => {
     5: {
       title: '需求规格说明',
       chapterTitle: '第二章 需求分析',
-      type: 'pdf',
-      pdfUrl: 'https://example.com/requirements.pdf',
+      type: 'text',
+      content: `
+        <h2>需求规格说明</h2>
+        <p>需求规格说明(SRS)是软件工程中至关重要的文档，它详细描述了软件系统的功能需求和非功能需求。</p>
+
+        <h3>SRS的主要内容</h3>
+        <ol>
+          <li><strong>引言</strong>：目的、范围、定义、参考文献</li>
+          <li><strong>总体描述</strong>：产品前景、用户特性、约束条件</li>
+          <li><strong>具体需求</strong>：外部接口需求、功能需求、性能需求等</li>
+          <li><strong>附录</strong>：分析模型、问题跟踪等</li>
+        </ol>
+
+        <h3>编写原则</h3>
+        <ul>
+          <li>使用清晰、简洁的语言</li>
+          <li>采用标准化的格式和模板</li>
+          <li>确保需求的可验证性</li>
+          <li>保持文档的一致性和完整性</li>
+          <li>及时更新和维护文档</li>
+        </ul>
+
+        <h3>质量保证</h3>
+        <p>SRS的质量直接影响软件开发的成败，应通过同行评审、原型验证等方式确保其准确性和完整性。</p>
+      `,
       duration: '65分钟',
       progress: 0,
-      completed: false
+      completed: false,
+      description: '详细讲解需求规格说明的编写方法和质量保证'
     },
     6: {
-      title: '需求验证',
+      title: '需求验证技术',
       chapterTitle: '第二章 需求分析',
-      type: 'text',
-      content: '<h2>需求验证</h2><p>需求验证是确保需求文档准确、完整、一致的过程...</p>',
+      type: 'video',
+      videoUrl: '/sample.mp4',
+      cover: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800',
       duration: '40分钟',
+      durationInSeconds: 2400,
       progress: 0,
-      completed: false
+      completed: false,
+      description: '深入讲解需求验证的各种技术和方法',
+      // 字幕数据
+      subtitles: [
+        {
+          id: 'zh',
+          label: '中文字幕',
+          language: 'zh',
+          data: [
+            { start: 3, end: 7, text: '需求验证是软件工程中的关键环节' },
+            { start: 8, end: 15, text: '它确保我们开发的产品真正满足用户需求' },
+            { start: 16, end: 24, text: '今天我们将学习多种需求验证技术' },
+            { start: 25, end: 32, text: '包括需求评审、原型验证和测试用例设计' },
+            { start: 33, end: 40, text: '掌握这些技术将大大提高项目成功率' }
+          ]
+        }
+      ],
+      // 课件同步数据
+      coursewareSync: {
+        enabled: true,
+        pages: [
+          {
+            pageNumber: 1,
+            startTime: 0,
+            endTime: 200,
+            title: '需求验证概述',
+            content: '需求验证的定义、目的和重要性',
+            preview: '/api/courseware/6/1/preview'
+          },
+          {
+            pageNumber: 2,
+            startTime: 200,
+            endTime: 800,
+            title: '需求评审方法',
+            content: '评审的类型、流程和最佳实践',
+            preview: '/api/courseware/6/2/preview'
+          },
+          {
+            pageNumber: 3,
+            startTime: 800,
+            endTime: 1400,
+            title: '原型验证技术',
+            content: '低保真原型和高保真原型的应用',
+            preview: '/api/courseware/6/3/preview'
+          },
+          {
+            pageNumber: 4,
+            startTime: 1400,
+            endTime: 2400,
+            title: '验证最佳实践',
+            content: '需求验证的检查清单和常见陷阱',
+            preview: '/api/courseware/6/4/preview'
+          }
+        ]
+      }
     }
   }
 
@@ -499,10 +875,19 @@ onMounted(() => {
   loadData()
 })
 
+onUnmounted(() => {
+  stopLearningTimer()
+})
+
 watch(() => route.params.sectionId, () => {
   if (route.params.sectionId) {
+    stopLearningTimer()
     loadSectionData()
     updateNavigationState()
+    // 重置学习状态
+    totalLearningTime.value = 0
+    learningSessionStart.value = null
+    currentCoursewarePage.value = null
   }
 })
 </script>
@@ -583,16 +968,113 @@ watch(() => route.params.sectionId, () => {
 
 .video-container {
   width: 100%;
-  height: 100%;
-  background: #000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// 学习工具栏样式
+.learning-toolbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e4e7ed;
+  flex-wrap: wrap;
 
-  video {
-    width: 100%;
-    height: 100%;
-    max-height: 70vh;
+  .toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-assistant-section {
+    flex-shrink: 0;
+  }
+
+  .notes-section {
+    flex-shrink: 0;
+  }
+
+  .progress-section {
+    flex: 1;
+    min-width: 200px;
+
+    .progress-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .progress-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #409eff;
+        min-width: 40px;
+      }
+    }
+  }
+
+  .courseware-section {
+    flex-shrink: 0;
+
+    :deep(.el-dropdown-menu) {
+      .el-dropdown-item {
+        &.active {
+          background-color: #ecf5ff;
+          color: #409eff;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .time-section {
+    flex-shrink: 0;
+
+    .time-stats {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #606266;
+
+      .el-icon {
+        color: #409eff;
+      }
+    }
+  }
+}
+
+// AI快捷问题样式
+.ai-shortcuts {
+  .shortcuts-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: #303133;
+    margin-bottom: 12px;
+  }
+
+  .shortcuts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .shortcut-btn {
+      text-align: left;
+      white-space: normal;
+      height: auto;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: all 0.3s;
+
+      &:hover {
+        background-color: #ecf5ff;
+        color: #409eff;
+      }
+    }
   }
 }
 
@@ -858,6 +1340,78 @@ watch(() => route.params.sectionId, () => {
     color: #909399;
     font-size: 14px;
     padding: 40px 0;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .top-header {
+    padding: 8px 16px;
+
+    .section-title {
+      font-size: 16px;
+    }
+
+    .back-btn {
+      position: relative;
+      left: auto;
+    }
+  }
+
+  .page-content {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e4e7ed;
+    max-height: 300px;
+  }
+
+  // 学习工具栏响应式
+  .learning-toolbar {
+    padding: 12px 16px;
+    gap: 12px;
+
+    .toolbar-section {
+      flex-shrink: 1;
+    }
+
+    .progress-section {
+      order: 5;
+      flex-basis: 100%;
+      min-width: auto;
+    }
+
+    .time-section {
+      order: 6;
+      flex-basis: 100%;
+      justify-content: center;
+
+      .time-stats {
+        font-size: 12px;
+      }
+    }
+
+    .ai-assistant-section,
+    .notes-section,
+    .courseware-section {
+      flex-shrink: 0;
+    }
+  }
+
+  .ai-shortcuts {
+    .shortcuts-list {
+      .shortcut-btn {
+        font-size: 13px;
+        padding: 6px 10px;
+      }
+    }
   }
 }
 </style>

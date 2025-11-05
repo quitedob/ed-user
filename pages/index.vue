@@ -60,7 +60,7 @@ import {
 
   // 使用静态数据替代API调用，避免加载延迟
   const websiteInfo = ref({
-    websiteName: 'Hydro+图形化作业系统',
+    websiteName: 'HOJ+图形化作业系统',
     websiteDesc: '基于开源OJ系统的二次开发，打造集学-练-评-讲于一体的在线编程学习平台'
   })
 

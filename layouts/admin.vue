@@ -4,7 +4,7 @@
     <el-header class="admin-header">
       <div class="header-left">
         <div class="logo">
-          <h3>Hydro Admin</h3>
+          <h3>HOJ Admin</h3>
         </div>
       </div>
       <div class="header-right">

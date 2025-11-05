@@ -486,7 +486,7 @@ const retakeAssessment = () => {
 }
 
 const shareResult = () => {
-  const shareText = `我在Hydro编程学习平台完成了能力测评，获得${assessmentResult.value.totalScore}分！快来测测你的水平吧！`
+  const shareText = `我在HOJ编程学习平台完成了能力测评，获得${assessmentResult.value.totalScore}分！快来测测你的水平吧！`
   navigator.share?.({
     title: '编程能力测评结果',
     text: shareText,

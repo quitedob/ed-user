@@ -1,7 +1,7 @@
 <template>
   <div class="demo-page">
     <div class="demo-header">
-      <h1>Hydro+图形化作业系统演示</h1>
+      <h1>HOJ+图形化作业系统演示</h1>
       <p class="demo-subtitle">基于开源OJ系统的二次开发，打造集学-练-评-讲于一体的在线编程学习平台</p>
     </div>
 
@@ -181,7 +181,7 @@
         <el-tag type="danger">SCSS</el-tag>
         <el-tag>PDF.js</el-tag>
         <el-tag>Quill.js</el-tag>
-        <el-tag>Hydro OJ</el-tag>
+        <el-tag>HOJ OJ</el-tag>
       </div>
     </div>
 
