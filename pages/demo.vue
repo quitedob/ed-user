@@ -165,7 +165,7 @@
           <span>能力测评系统</span>
         </div>
         <div class="feature-item">
-          <el-icon size="24" color="#52C41A"><BarChart /></el-icon>
+          <el-icon size="24" color="#52C41A"><TrendCharts /></el-icon>
           <span>学习数据分析</span>
         </div>
       </div>
@@ -237,8 +237,7 @@ import {
   HomeFilled,
   Edit,
   ZoomIn,
-  VideoCamera,
-  BarChart
+  VideoCamera
 } from '@element-plus/icons-vue'
 
 const navigateTo = (path) => {

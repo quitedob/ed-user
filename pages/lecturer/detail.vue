@@ -1,22 +1,20 @@
 <template>
-  <NuxtLayout>
-    <div class="lecturer">
-      <div class="lecturer-info">
-        <img :src="lecturerInfo.lecturerHead" :alt="lecturerInfo.lecturerName" />
-        <div class="item-info">
-          <div>{{ lecturerInfo.lecturerName }} {{ lecturerInfo.lecturerPosition }}</div>
-          <div v-html="lecturerInfo.introduce" />
-        </div>
+  <div class="lecturer">
+    <div class="lecturer-info">
+      <img :src="lecturerInfo.lecturerHead" :alt="lecturerInfo.lecturerName" />
+      <div class="item-info">
+        <div>{{ lecturerInfo.lecturerName }} {{ lecturerInfo.lecturerPosition }}</div>
+        <div v-html="lecturerInfo.introduce" />
       </div>
     </div>
-    <div class="course">
-      <div v-if="lecturerInfo.courseViewVO.length > 0" class="course-info">
-        <!-- 课程列表 -->
-        <course-list :list="lecturerInfo.courseViewVO" />
-      </div>
-      <div v-else class="no-data">暂无数据</div>
+  </div>
+  <div class="course">
+    <div v-if="lecturerInfo.courseViewVO.length > 0" class="course-info">
+      <!-- 课程列表 -->
+      <course-list :list="lecturerInfo.courseViewVO" />
     </div>
-  </NuxtLayout>
+    <div v-else class="no-data">暂无数据</div>
+  </div>
 </template>
 <script setup>
   import { lecturerApi } from '~/api/lecturer'

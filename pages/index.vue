@@ -1,48 +1,44 @@
 <template>
-  <NuxtLayout>
-    <div class="main">
-      <!-- Demo入口 -->
-      <div class="demo-banner">
-        <div class="demo-content">
-          <h1>Hoj图形化作业系统</h1>
-          <p class="demo-desc">基于开源OJ系统的二次开发，打造集学-练-评-讲于一体的在线编程学习平台</p>
-          <div class="demo-actions">
-            <el-button type="primary" size="large" @click="goToDemo">
-              <el-icon><View /></el-icon>
-              查看系统Demo
-            </el-button>
-            <el-button size="large" @click="goToLogin">
-              <el-icon><User /></el-icon>
-              开始学习之旅
-            </el-button>
-          </div>
-        </div>
-        <div class="demo-features">
-          <div class="feature-item">
-            <el-icon size="32" color="#409EFF"><VideoPlay /></el-icon>
-            <span>视频教学</span>
-          </div>
-          <div class="feature-item">
-            <el-icon size="32" color="#67C23A"><Document /></el-icon>
-            <span>OJ练习</span>
-          </div>
-          <div class="feature-item">
-            <el-icon size="32" color="#E6A23C"><ChatDotRound /></el-icon>
-            <span>AI助教</span>
-          </div>
-          <div class="feature-item">
-            <el-icon size="32" color="#F56C6C"><DataAnalysis /></el-icon>
-            <span>能力测评</span>
-          </div>
+  <div class="main">
+    <!-- Demo入口 -->
+    <div class="demo-banner">
+      <div class="demo-content">
+        <h1>Hoj图形化作业系统</h1>
+        <p class="demo-desc">基于开源OJ系统的二次开发，打造集学-练-评-讲于一体的在线编程学习平台</p>
+        <div class="demo-actions">
+          <el-button type="primary" size="large" @click="goToDemo">
+            <el-icon><View /></el-icon>
+            查看系统Demo
+          </el-button>
+          <el-button size="large" @click="goToLogin">
+            <el-icon><User /></el-icon>
+            开始学习之旅
+          </el-button>
         </div>
       </div>
-
-
-
-      <zone-course />
+      <div class="demo-features">
+        <div class="feature-item">
+          <el-icon size="32" color="#409EFF"><VideoPlay /></el-icon>
+          <span>视频教学</span>
+        </div>
+        <div class="feature-item">
+          <el-icon size="32" color="#67C23A"><Document /></el-icon>
+          <span>OJ练习</span>
+        </div>
+        <div class="feature-item">
+          <el-icon size="32" color="#E6A23C"><ChatDotRound /></el-icon>
+          <span>AI助教</span>
+        </div>
+        <div class="feature-item">
+          <el-icon size="32" color="#F56C6C"><DataAnalysis /></el-icon>
+          <span>能力测评</span>
+        </div>
+      </div>
     </div>
-    <common-link />
-  </NuxtLayout>
+
+    <zone-course />
+  </div>
+  <common-link />
 </template>
 <script setup>
 import {

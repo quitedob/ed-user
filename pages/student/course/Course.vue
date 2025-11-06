@@ -15,8 +15,16 @@
       </div>
     </div>
 
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-container">
+      <el-icon class="is-loading" :size="40">
+        <Loading />
+      </el-icon>
+      <p>正在加载课程数据...</p>
+    </div>
+
     <!-- 课程卡片网格 -->
-    <div class="course-grid">
+    <div v-else class="course-grid">
       <div
         v-for="course in filteredCourses"
         :key="course.id"
@@ -47,15 +55,29 @@
 </template>
 
 <script setup>
-import { Plus, Folder, Search } from '@element-plus/icons-vue'
+import { Plus, Folder, Search, Loading } from '@element-plus/icons-vue'
+import { useCourseApi } from '~/composables/useMockApi'
 
 const router = useRouter()
+const { getAuthCourses } = useCourseApi()
 
 // 搜索
 const searchQuery = ref('')
 
-// 虚拟课程数据
-const courses = ref([
+// 课程数据
+const courses = ref([])
+const loading = ref(true)
+
+// 获取课程数据
+onMounted(async () => {
+  try {
+    const data = await getAuthCourses()
+    courses.value = data || []
+  } catch (error) {
+    console.warn('API不可用，使用本地模拟数据')
+    // 如果API失败，使用默认数据
+    courses.value = [
+
   {
     id: 1,
     title: '软件工程导论',
@@ -63,7 +85,7 @@ const courses = ref([
     teacher: '李教授',
     startDate: '2024-08-31',
     endDate: '2025-06-31',
-    cover: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400',
+    cover: '/images/common_head.jpg',
     completedChapters: 46,
     totalChapters: 50,
     progress: 92
@@ -75,7 +97,7 @@ const courses = ref([
     teacher: '王教授',
     startDate: '2024-09-01',
     endDate: '2025-01-15',
-    cover: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400',
+    cover: '/images/logo.png',
     completedChapters: 12,
     totalChapters: 40,
     progress: 30
@@ -87,7 +109,7 @@ const courses = ref([
     teacher: '刘老师',
     startDate: '2024-08-31',
     endDate: '2025-06-31',
-    cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
+    cover: '/images/common_login.png',
     completedChapters: 25,
     totalChapters: 35,
     progress: 71
@@ -99,7 +121,7 @@ const courses = ref([
     teacher: '张教授',
     startDate: '2024-09-01',
     endDate: '2025-01-20',
-    cover: 'https://images.unsplash.com/photo-1509966756634-9c23dd6e6815?w=400',
+    cover: '/images/phone.png',
     completedChapters: 8,
     totalChapters: 30,
     progress: 27
@@ -111,7 +133,7 @@ const courses = ref([
     teacher: '赵老师',
     startDate: '2024-08-31',
     endDate: '2025-06-31',
-    cover: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400',
+    cover: '/images/common_head.jpg',
     completedChapters: 18,
     totalChapters: 28,
     progress: 64
@@ -123,7 +145,7 @@ const courses = ref([
     teacher: '陈教授',
     startDate: '2024-09-01',
     endDate: '2025-01-25',
-    cover: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400',
+    cover: '/images/logo.png',
     completedChapters: 5,
     totalChapters: 32,
     progress: 16
@@ -135,7 +157,7 @@ const courses = ref([
     teacher: '周老师',
     startDate: '2024-08-31',
     endDate: '2025-06-31',
-    cover: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=400',
+    cover: '/images/common_login.png',
     completedChapters: 22,
     totalChapters: 26,
     progress: 85
@@ -147,12 +169,16 @@ const courses = ref([
     teacher: '吴老师',
     startDate: '2024-09-01',
     endDate: '2025-01-30',
-    cover: 'https://images.unsplash.com/photo-1593720213428-28a5b9e94613?w=400',
+    cover: '/images/phone.png',
     completedChapters: 15,
     totalChapters: 24,
     progress: 63
   }
-])
+    ]
+  } finally {
+    loading.value = false
+  }
+})
 
 // 计算属性：过滤课程
 const filteredCourses = computed(() => {
@@ -164,6 +190,7 @@ const filteredCourses = computed(() => {
 })
 
 const goToCourse = (courseId) => {
+  console.log('跳转到课程详情:', courseId)
   router.push(`/student/course/${courseId}`)
 }
 </script>
@@ -212,6 +239,20 @@ const goToCourse = (courseId) => {
 
   .search-input {
     width: 300px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: 16px;
+
+  p {
+    font-size: 16px;
+    color: #909399;
   }
 }
 

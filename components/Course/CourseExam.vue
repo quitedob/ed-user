@@ -132,9 +132,20 @@ const pendingExamsList = ref([
     questionCount: 50,
     deadline: '2024-12-15',
     totalScore: 100,
-    passScore: 60
+    passScore: 60,
+    status: 'pending' // pending, completed
   }
 ])
+
+// 从localStorage加载已完成的考试
+const loadCompletedExams = () => {
+  const completed = localStorage.getItem('completedExams')
+  if (completed) {
+    const completedIds = JSON.parse(completed)
+    // 将已完成的考试从待完成列表移除
+    pendingExamsList.value = pendingExamsList.value.filter(exam => !completedIds.includes(exam.id))
+  }
+}
 
 // 已完成考试
 const completedExamsList = ref([
@@ -185,15 +196,24 @@ const getDeadlineText = (deadline) => {
   return `${diffDays}天后到期`
 }
 
+const route = useRoute()
+const router = useRouter()
+
+const courseId = computed(() => parseInt(route.params.id) || 1)
+
 const startExam = (examId) => {
-  ElMessage.info(`开始考试 ${examId}`)
-  // TODO: 跳转到考试页面
+  router.push(`/student/exam/${examId}`)
 }
 
 const viewExamResult = (examId) => {
   ElMessage.info(`查看考试结果 ${examId}`)
   // TODO: 跳转到考试结果页面
 }
+
+// 生命周期
+onMounted(() => {
+  loadCompletedExams()
+})
 </script>
 
 <style lang="scss" scoped>

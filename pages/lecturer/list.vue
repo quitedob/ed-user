@@ -1,15 +1,13 @@
 <template>
-  <NuxtLayout>
-    <div class="main course-list">
-      <!-- 讲师列表 -->
-      <lecturer-list v-loading="page.loading" :list="page.list" />
+  <div class="main course-list">
+    <!-- 讲师列表 -->
+    <lecturer-list v-loading="page.loading" :list="page.list" />
 
-      <!-- 分页功能 -->
-      <div v-if="page.totalCount >= 1" class="pagination clearfix">
-        <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
-      </div>
+    <!-- 分页功能 -->
+    <div v-if="page.totalCount >= 1" class="pagination clearfix">
+      <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 <script setup>
   import { websiteInfo, mockLecturerList, mockApiCall } from '~/utils/mockData'

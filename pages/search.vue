@@ -1,35 +1,33 @@
 <template>
-  <NuxtLayout>
-    <div class="main search">
-      <div class="search-info">
-        <el-input v-model="kw" class="search-input" placeholder="请输入课程名称" @keyup.enter="handleSearch">
-          <template #suffix>
-            <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
-          </template>
-        </el-input>
-      </div>
+  <div class="main search">
+    <div class="search-info">
+      <el-input v-model="kw" class="search-input" placeholder="请输入课程名称" @keyup.enter="handleSearch">
+        <template #suffix>
+          <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
+        </template>
+      </el-input>
+    </div>
 
-      <el-tabs v-model="activeName" @tab-change="handleSearch">
-        <el-tab-pane label="课程" name="course"></el-tab-pane>
-        <el-tab-pane label="讲师" name="lecturer"></el-tab-pane>
-      </el-tabs>
+    <el-tabs v-model="activeName" @tab-change="handleSearch">
+      <el-tab-pane label="课程" name="course"></el-tab-pane>
+      <el-tab-pane label="讲师" name="lecturer"></el-tab-pane>
+    </el-tabs>
 
-      <div class="search-result">搜索结果：{{ page.totalCount }} 个</div>
-      <div v-if="activeName === 'course'">
-        <course-list :list="page.list" />
-        <div v-if="page.totalCount >= 1" class="pagination clearfix">
-          <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
-        </div>
-      </div>
-
-      <div v-if="activeName === 'lecturer'">
-        <lecturer-list :list="page.list" />
-        <div v-if="page.totalCount >= 1" class="pagination clearfix">
-          <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
-        </div>
+    <div class="search-result">搜索结果：{{ page.totalCount }} 个</div>
+    <div v-if="activeName === 'course'">
+      <course-list :list="page.list" />
+      <div v-if="page.totalCount >= 1" class="pagination clearfix">
+        <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
       </div>
     </div>
-  </NuxtLayout>
+
+    <div v-if="activeName === 'lecturer'">
+      <lecturer-list :list="page.list" />
+      <div v-if="page.totalCount >= 1" class="pagination clearfix">
+        <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
+      </div>
+    </div>
+  </div>
 </template>
 <script setup>
   import { useCourseApi } from '~/composables/useMockApi'

@@ -13,13 +13,21 @@ export default defineNuxtConfig({
       useMockData: process.env.NODE_ENV === 'development' // 开发环境使用模拟数据
     }
   },
+  // 禁用服务器端渲染以解决hydration mismatch问题
+  ssr: false,
+
   nitro: {
-    devProxy: {
-      '/gateway': {
-        target: 'http://localhost:8080',
-        changeOrigin: true
-      }
-    },
+    // 注释掉代理配置，因为应用完全使用模拟数据，没有真实后端
+    // devProxy: {
+    //   '/gateway': {
+    //     target: 'https://localhost:8080', // 开发环境后端使用HTTPS
+    //     changeOrigin: true,
+    //     secure: false, // 开发环境忽略SSL证书验证
+    //     headers: {
+    //       'X-Forwarded-Proto': 'https' // 告诉后端这是HTTPS请求
+    //     }
+    //   }
+    // },
     routeRules: {
       // 301永久重定向：旧的课程学习页面重定向到新的学生门户
       '/course/study': { redirect: { to: '/student/course', statusCode: 301 } }
@@ -32,16 +40,16 @@ export default defineNuxtConfig({
     }
   },
   devServer: {
-    https: false, // 暂时禁用HTTPS以解决503错误
+    https: true, // 启用HTTPS
     host: 'localhost',
     port: 3000
   },
   vite: {
     plugins: [
-      mkcert() // 添加mkcert插件用于自动生成SSL证书
+      mkcert() // 使用mkcert自动生成SSL证书
     ],
     server: {
-      https: false, // 暂时禁用HTTPS以解决503错误
+      https: true, // 使用mkcert自动生成SSL证书
       cors: true,
       strictPort: false,
       hmr: {

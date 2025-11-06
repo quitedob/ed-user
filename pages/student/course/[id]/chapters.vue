@@ -142,6 +142,10 @@ const continueStudy = () => {
 
 // 加载课程数据
 const loadCourseData = async () => {
+  // 确保正确获取课程ID
+  const courseId = parseInt(route.params.id)
+  console.log('加载课程数据，课程ID:', courseId)
+  
   // 模拟课程数据
   const courseData = {
     1: {
@@ -151,7 +155,7 @@ const loadCourseData = async () => {
       duration: '48课时',
       startDate: '2024-08-31',
       endDate: '2025-06-31',
-      cover: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400',
+      cover: '/images/common_head.jpg',
       description: '本课程介绍软件工程的基本概念、原理和方法，包括软件开发过程、需求分析、系统设计、编码实现、测试维护等内容。通过本课程的学习，学生将掌握软件工程的基本理论和实践方法，具备软件开发的基本能力。',
       progress: 92,
       completedChapters: 46,
@@ -166,7 +170,7 @@ const loadCourseData = async () => {
       duration: '40课时',
       startDate: '2024-09-01',
       endDate: '2025-01-15',
-      cover: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400',
+      cover: '/images/logo.png',
       description: '编译原理是计算机科学与技术专业的核心课程，主要介绍编译器的设计和实现原理。课程内容包括词法分析、语法分析、语义分析、中间代码生成、代码优化和目标代码生成等编译器各个阶段的设计和实现技术。',
       progress: 30,
       completedChapters: 12,
@@ -181,7 +185,7 @@ const loadCourseData = async () => {
       duration: '35课时',
       startDate: '2024-08-31',
       endDate: '2025-06-31',
-      cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
+      cover: '/images/common_login.png',
       description: 'Java基础技术课程涵盖Java编程语言的核心概念和基础知识，包括面向对象编程、集合框架、异常处理、IO流等内容。',
       progress: 71,
       completedChapters: 25,
@@ -191,9 +195,30 @@ const loadCourseData = async () => {
     }
   }
 
-  const course = courseData[route.params.id]
+  const course = courseData[courseId]
   if (course) {
-    courseInfo.value = { ...course, id: parseInt(route.params.id) }
+    courseInfo.value = { ...course, id: courseId }
+    console.log('加载课程数据成功:', courseInfo.value)
+    loadChaptersData()
+  } else {
+    console.error('未找到课程数据，课程ID:', courseId)
+    // 如果找不到课程，使用默认数据
+    courseInfo.value = {
+      id: courseId,
+      title: '课程详情',
+      school: '芝麻编程',
+      teacher: '教师',
+      duration: '40课时',
+      startDate: '2024-09-01',
+      endDate: '2025-06-30',
+      cover: '/images/logo.png',
+      description: '课程描述',
+      progress: 0,
+      completedChapters: 0,
+      totalChapters: 0,
+      studyTime: '0小时',
+      lastStudyTime: '从未学习'
+    }
     loadChaptersData()
   }
 }

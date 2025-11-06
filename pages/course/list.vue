@@ -1,18 +1,16 @@
 <template>
-  <NuxtLayout>
-    <div class="main course-list">
-      <!-- 选择分类 -->
-      <course-choose v-for="(category, index) in categoryList" :key="index" :menu="category" :index="index" @change="handleChange" />
+  <div class="main course-list">
+    <!-- 选择分类 -->
+    <course-choose v-for="(category, index) in categoryList" :key="index" :menu="category" :index="index" @change="handleChange" />
 
-      <!-- 课程列表 -->
-      <course-list v-loading="page.loading" :list="page.list" />
+    <!-- 课程列表 -->
+    <course-list v-loading="page.loading" :list="page.list" />
 
-      <!-- 分页功能 -->
-      <div v-if="page.totalCount >= 1" class="pagination clearfix">
-        <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
-      </div>
+    <!-- 分页功能 -->
+    <div v-if="page.totalCount >= 1" class="pagination clearfix">
+      <common-pagination v-model:current-page="page.pageCurrent" v-model:page-size="page.pageSize" :total="page.totalCount" @pagination="handlePage" />
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 <script setup>
   import { courseApi } from '~/api/course.js'

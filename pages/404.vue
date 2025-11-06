@@ -1,62 +1,60 @@
 <template>
-  <NuxtLayout>
-    <div class="error-page">
-      <el-result icon="info" status="404" title="对不起，您访问的内容不存在！">
-        <template #sub-title>
-          <div class="error-info">
-            <p>请求的页面：<code>{{ currentPath }}</code></p>
-            <p v-if="errorMessage" class="error-message">错误信息：{{ errorMessage }}</p>
-          </div>
-        </template>
-        <template #extra>
-          <div class="action-buttons">
-            <el-button type="primary" @click="goHome">前往首页</el-button>
-            <el-button type="success" @click="goBack">返回上一页</el-button>
-            <el-button type="warning" @click="showErrorLog" v-if="hasConsoleErrors">
-              查看错误日志
-            </el-button>
-          </div>
-        </template>
-      </el-result>
-
-      <!-- 错误日志弹窗 -->
-      <el-dialog
-        v-model="errorLogVisible"
-        title="错误日志"
-        width="700px"
-        :close-on-click-modal="false"
-      >
-        <div class="error-log-content">
-          <div class="log-header">
-            <span class="log-title">控制台错误信息</span>
-            <el-button 
-              type="primary" 
-              size="small" 
-              @click="copyErrorLog"
-              :icon="CopyDocument"
-            >
-              一键复制
-            </el-button>
-          </div>
-          
-          <div class="log-body">
-            <pre>{{ errorLogText }}</pre>
-          </div>
-
-          <div class="log-footer">
-            <el-alert
-              v-if="copySuccess"
-              title="复制成功！错误日志已复制到剪贴板"
-              type="success"
-              :closable="false"
-              show-icon
-            />
-            <p class="tip">提示：您可以将此错误日志发送给技术支持团队</p>
-          </div>
+  <div class="error-page">
+    <el-result icon="info" status="404" title="对不起，您访问的内容不存在！">
+      <template #sub-title>
+        <div class="error-info">
+          <p>请求的页面：<code>{{ currentPath }}</code></p>
+          <p v-if="errorMessage" class="error-message">错误信息：{{ errorMessage }}</p>
         </div>
-      </el-dialog>
-    </div>
-  </NuxtLayout>
+      </template>
+      <template #extra>
+        <div class="action-buttons">
+          <el-button type="primary" @click="goHome">前往首页</el-button>
+          <el-button type="success" @click="goBack">返回上一页</el-button>
+          <el-button type="warning" @click="showErrorLog" v-if="hasConsoleErrors">
+            查看错误日志
+          </el-button>
+        </div>
+      </template>
+    </el-result>
+
+    <!-- 错误日志弹窗 -->
+    <el-dialog
+      v-model="errorLogVisible"
+      title="错误日志"
+      width="700px"
+      :close-on-click-modal="false"
+    >
+      <div class="error-log-content">
+        <div class="log-header">
+          <span class="log-title">控制台错误信息</span>
+          <el-button 
+            type="primary" 
+            size="small" 
+            @click="copyErrorLog"
+            :icon="CopyDocument"
+          >
+            一键复制
+          </el-button>
+        </div>
+        
+        <div class="log-body">
+          <pre>{{ errorLogText }}</pre>
+        </div>
+
+        <div class="log-footer">
+          <el-alert
+            v-if="copySuccess"
+            title="复制成功！错误日志已复制到剪贴板"
+            type="success"
+            :closable="false"
+            show-icon
+          />
+          <p class="tip">提示：您可以将此错误日志发送给技术支持团队</p>
+        </div>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup>

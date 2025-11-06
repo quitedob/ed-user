@@ -1,49 +1,47 @@
 <template>
-  <NuxtLayout>
-    <div class="detail_content">
-      <div class="detail_body">
-        <div class="detail_header clearfix">
-          <div class="detail_title">
-            <nuxt-link :to="{ path: '/' }"> 首页 </nuxt-link>
-            <span>></span>
-          </div>
-          <div class="detail_title">
-            <nuxt-link :to="{ name: 'course-list' }"> 课程中心 </nuxt-link>
-            <span>></span>
-          </div>
-          <div class="detail_title">
-            {{ courseInfo.courseName }}
-          </div>
+  <div class="detail_content">
+    <div class="detail_body">
+      <div class="detail_header clearfix">
+        <div class="detail_title">
+          <nuxt-link :to="{ path: '/' }"> 首页 </nuxt-link>
+          <span>></span>
         </div>
-        <div class="clearfix">
-          <div class="video_box">
-            <img class="detail_view" :src="courseInfo?.courseLogo" :alt="courseInfo?.courseName" />
-            <div class="view_info">
-              <!-- 课程详情 -->
-              <div class="view_info_course">
-                {{ courseInfo.courseName }}
+        <div class="detail_title">
+          <nuxt-link :to="{ name: 'course-list' }"> 课程中心 </nuxt-link>
+          <span>></span>
+        </div>
+        <div class="detail_title">
+          {{ courseInfo.courseName }}
+        </div>
+      </div>
+      <div class="clearfix">
+        <div class="video_box">
+          <img class="detail_view" :src="courseInfo?.courseLogo" :alt="courseInfo?.courseName" />
+          <div class="view_info">
+            <!-- 课程详情 -->
+            <div class="view_info_course">
+              {{ courseInfo.courseName }}
+            </div>
+            <div class="view_price">
+              <div>
+                价格:<span v-if="courseInfo.coursePrice === 0">免费</span>
+                <span v-else>
+                  ￥{{ courseInfo.coursePrice }} <b style="text-decoration-line: line-through; color: grey; font-size: 18px">￥{{ courseInfo.rulingPrice }}</b>
+                </span>
               </div>
-              <div class="view_price">
-                <div>
-                  价格:<span v-if="courseInfo.coursePrice === 0">免费</span>
-                  <span v-else>
-                    ￥{{ courseInfo.coursePrice }} <b style="text-decoration-line: line-through; color: grey; font-size: 18px">￥{{ courseInfo.rulingPrice }}</b>
-                  </span>
-                </div>
-              </div>
-              <div v-if="courseInfo.lecturerResp" class="view_info_item">
-                <span class="text_b">讲师名称:</span>{{ courseInfo.lecturerResp.lecturerName }}（{{ courseInfo.lecturerResp.lecturerPosition }}）
-              </div>
-              <div class="view_info_item"><span class="text_b">购买人数:</span>{{ courseInfo.countBuy }} 人</div>
-              <div class="view_info_item"><span class="text_b">学习人数:</span>{{ courseInfo.countStudy }} 人</div>
-              <div class="foot_box">
-                <button v-if="courseInfo.allowStudy === 1" class="buy_btn" @click="handleStudy">马上学习</button>
-                <button v-else-if="courseInfo.isFree === 0" class="buy_btn" @click="handleBuy(courseInfo)">立即购买</button>
-                <button v-else-if="courseInfo.isFree === 1" class="buy_btn" @click="handleLogin">登录观看</button>
-                <div class="handle_info_btn">
-                  <div class="collect_btn">
-                    <course-collect :course-id="courseInfo.id" :collect-status="courseInfo.courseCollect" />
-                  </div>
+            </div>
+            <div v-if="courseInfo.lecturerResp" class="view_info_item">
+              <span class="text_b">讲师名称:</span>{{ courseInfo.lecturerResp.lecturerName }}（{{ courseInfo.lecturerResp.lecturerPosition }}）
+            </div>
+            <div class="view_info_item"><span class="text_b">购买人数:</span>{{ courseInfo.countBuy }} 人</div>
+            <div class="view_info_item"><span class="text_b">学习人数:</span>{{ courseInfo.countStudy }} 人</div>
+            <div class="foot_box">
+              <button v-if="courseInfo.allowStudy === 1" class="buy_btn" @click="handleStudy">马上学习</button>
+              <button v-else-if="courseInfo.isFree === 0" class="buy_btn" @click="handleBuy(courseInfo)">立即购买</button>
+              <button v-else-if="courseInfo.isFree === 1" class="buy_btn" @click="handleLogin">登录观看</button>
+              <div class="handle_info_btn">
+                <div class="collect_btn">
+                  <course-collect :course-id="courseInfo.id" :collect-status="courseInfo.courseCollect" />
                 </div>
               </div>
             </div>
@@ -51,69 +49,69 @@
         </div>
       </div>
     </div>
-    <div class="main">
-      <!-- 章节详情 -->
-      <div class="course_info clearfix">
-        <div class="layout_left">
-          <el-tabs type="border-card" @tab-click="handleTabClick">
-            <el-tab-pane label="课程介绍">
-              <div class="introduce" v-html="courseInfo.introduce" />
-            </el-tab-pane>
-            <el-tab-pane label="课程目录">
-              <course-chapter :list="courseInfo.chapterRespList" />
-            </el-tab-pane>
-            <el-tab-pane label="课程评价" name="review">
-              <div class="course-review">
-                <div class="review-stats">
-                  <div class="rating">
-                    <el-rate v-model="courseInfo.rating" disabled show-score text-color="#ff9900" score-template="{value} 分" />
-                    <span class="rating-count">({{ courseInfo.reviewCount }}人评价)</span>
-                  </div>
+  </div>
+  <div class="main">
+    <!-- 章节详情 -->
+    <div class="course_info clearfix">
+      <div class="layout_left">
+        <el-tabs type="border-card" @tab-click="handleTabClick">
+          <el-tab-pane label="课程介绍">
+            <div class="introduce" v-html="courseInfo.introduce" />
+          </el-tab-pane>
+          <el-tab-pane label="课程目录">
+            <course-chapter :list="courseInfo.chapterRespList" />
+          </el-tab-pane>
+          <el-tab-pane label="课程评价" name="review">
+            <div class="course-review">
+              <div class="review-stats">
+                <div class="rating">
+                  <el-rate v-model="courseInfo.rating" disabled show-score text-color="#ff9900" score-template="{value} 分" />
+                  <span class="rating-count">({{ courseInfo.reviewCount }}人评价)</span>
                 </div>
-                <div class="review-list">
-                  <div v-for="review in courseInfo.reviews" :key="review.id" class="review-item">
-                    <div class="review-header">
-                      <div class="reviewer-info">
-                        <img :src="review.avatar" :alt="review.reviewerName" class="reviewer-avatar" />
-                        <div class="reviewer-details">
-                          <span class="reviewer-name">{{ review.reviewerName }}</span>
-                          <el-rate v-model="review.rating" disabled size="small" />
-                        </div>
+              </div>
+              <div class="review-list">
+                <div v-for="review in courseInfo.reviews" :key="review.id" class="review-item">
+                  <div class="review-header">
+                    <div class="reviewer-info">
+                      <img :src="review.avatar" :alt="review.reviewerName" class="reviewer-avatar" />
+                      <div class="reviewer-details">
+                        <span class="reviewer-name">{{ review.reviewerName }}</span>
+                        <el-rate v-model="review.rating" disabled size="small" />
                       </div>
-                      <span class="review-time">{{ review.createTime }}</span>
                     </div>
-                    <div class="review-content">
-                      {{ review.content }}
-                    </div>
+                    <span class="review-time">{{ review.createTime }}</span>
+                  </div>
+                  <div class="review-content">
+                    {{ review.content }}
                   </div>
                 </div>
               </div>
-            </el-tab-pane>
-          </el-tabs>
-        </div>
-        <div class="layout_right">
-          <div class="teacher_info clearfix">
-            <span class="head">讲师简介</span>
-            <div class="teacher_msg">
-              <nuxt-link target="_blank" :to="{ name: 'lecturer-detail', query: { id: courseInfo.lecturerResp.id } }">
-                <div v-if="courseInfo.lecturerResp" class="teacher_msg_right">
-                  <img v-if="courseInfo.lecturerResp.lecturerHead" class="teacher_phone" :src="courseInfo.lecturerResp.lecturerHead" alt="" />
-                  <img v-else class="teacher_phone" src="~/assets/image/common_head.jpg" alt="" />
-                  <div class="teacher_info_content">
-                    <span class="teacher_name">{{ courseInfo.lecturerResp.lecturerName }}</span>
-                    <br />
-                    {{ courseInfo.lecturerResp.lecturerPosition }}
-                  </div>
-                </div>
-              </nuxt-link>
-              <div class="info_box" v-html="courseInfo.lecturerResp?.introduce" />
             </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+      <div class="layout_right">
+        <div class="teacher_info clearfix">
+          <span class="head">讲师简介</span>
+          <div class="teacher_msg">
+            <nuxt-link target="_blank" :to="{ name: 'lecturer-detail', query: { id: courseInfo.lecturerResp.id } }">
+              <div v-if="courseInfo.lecturerResp" class="teacher_msg_right">
+                <img v-if="courseInfo.lecturerResp.lecturerHead" class="teacher_phone" :src="courseInfo.lecturerResp.lecturerHead" alt="" />
+                <img v-else class="teacher_phone" src="~/assets/image/common_head.jpg" alt="" />
+                <div class="teacher_info_content">
+                  <span class="teacher_name">{{ courseInfo.lecturerResp.lecturerName }}</span>
+                  <br />
+                  {{ courseInfo.lecturerResp.lecturerPosition }}
+                </div>
+              </div>
+            </nuxt-link>
+            <div class="info_box" v-html="courseInfo.lecturerResp?.introduce" />
           </div>
         </div>
       </div>
     </div>
-    <common-pay ref="commonPayRef" @refresh="handleCourse" />
-  </NuxtLayout>
+  </div>
+  <common-pay ref="commonPayRef" @refresh="handleCourse" />
 </template>
 <script setup>
   import { courseApi } from '~/api/course.js'

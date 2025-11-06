@@ -1,5 +1,11 @@
 <template>
-  <div class="course-detail-page">
+  <!-- 如果是学习页面，直接显示内容，不显示课程头部和侧边栏 -->
+  <div v-if="isLearningPage" class="learning-page">
+    <NuxtPage />
+  </div>
+
+  <!-- 否则显示完整的课程详情页布局 -->
+  <div v-else class="course-detail-page">
     <!-- 课程头部 -->
     <div class="course-header">
       <div class="course-cover">
@@ -77,6 +83,11 @@ const tabs = [
 
 // 当前激活的标签
 const activeTab = ref('chapters')
+
+// 判断是否是学习页面（学习页面和考试详情页不显示课程头部和侧边栏）
+const isLearningPage = computed(() => {
+  return route.path.includes('/section/') || route.path.match(/\/exam\/\d+/)
+})
 
 // 切换标签
 const switchTab = (tabKey) => {
@@ -219,5 +230,10 @@ onMounted(() => {
   flex: 1;
   overflow-y: auto;
   background: #f5f7fa;
+}
+
+.learning-page {
+  width: 100%;
+  height: 100%;
 }
 </style>

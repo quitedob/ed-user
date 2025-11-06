@@ -1,39 +1,37 @@
 <template>
-  <NuxtLayout>
-    <div class="login_body">
-      <div class="login_box">
-        <div class="login_content">
-          <div class="login_title">
-            <div class="login_title_name">重置密码</div>
-            <div>
-              <nuxt-link to="/login"> 返回账号登录 </nuxt-link>
-            </div>
+  <div class="login_body">
+    <div class="login_box">
+      <div class="login_content">
+        <div class="login_title">
+          <div class="login_title_name">重置密码</div>
+          <div>
+            <nuxt-link to="/login"> 返回账号登录 </nuxt-link>
           </div>
-          <div class="login_form">
-            <el-form v-loading="loading" :model="loginForm" @keyup.enter="onSubmit">
-              <el-form-item prop="mobile">
-                <el-input v-model="loginForm.mobile" placeholder="手机号" autofocus />
-              </el-form-item>
-              <el-form-item prop="verificationCode">
-                <el-input v-model="loginForm.verificationCode" placeholder="验证码">
-                  <template #suffix>
-                    <el-button link @click="getCode"> 获取验证码 </el-button>
-                  </template>
-                </el-input>
-              </el-form-item>
-              <el-form-item prop="loginPwd">
-                <el-input v-model="mobilePwd" type="password" show-password placeholder="密码由6-20位大写和小写字母和数字组成" />
-              </el-form-item>
-              <el-form-item prop="repeatPwd">
-                <el-input v-model="mobilePwdRepeat" type="password" show-password placeholder="确认密码" />
-              </el-form-item>
-              <el-button class="login-button" type="primary" size="large" @click="onSubmit"> 重 置 </el-button>
-            </el-form>
-          </div>
+        </div>
+        <div class="login_form">
+          <el-form v-loading="loading" :model="loginForm" @keyup.enter="onSubmit">
+            <el-form-item prop="mobile">
+              <el-input v-model="loginForm.mobile" placeholder="手机号" autofocus />
+            </el-form-item>
+            <el-form-item prop="verificationCode">
+              <el-input v-model="loginForm.verificationCode" placeholder="验证码">
+                <template #suffix>
+                  <el-button link @click="getCode"> 获取验证码 </el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="loginPwd">
+              <el-input v-model="mobilePwd" type="password" show-password placeholder="密码由6-20位大写和小写字母和数字组成" />
+            </el-form-item>
+            <el-form-item prop="repeatPwd">
+              <el-input v-model="mobilePwdRepeat" type="password" show-password placeholder="确认密码" />
+            </el-form-item>
+            <el-button class="login-button" type="primary" size="large" @click="onSubmit"> 重 置 </el-button>
+          </el-form>
         </div>
       </div>
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 <script setup>
   import { loginApi } from '~/api/login.js'

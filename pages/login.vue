@@ -1,75 +1,73 @@
 <template>
-  <NuxtLayout>
-    <div class="login_body">
-      <div class="login_box">
-        <div class="login_logo">
-          <img src="../assets/image/common_login.png" alt="" />
-        </div>
-        <div class="login_content">
-          <img v-if="isPwdLogin && websiteInfo?.wxPcLoginEnable === '1'" src="https://asset.roncoos.com/static/qr.png" class="login_ico" @click="switchLogin" alt="" />
-          <img v-if="!isPwdLogin && websiteInfo?.wxPcLoginEnable === '1'" src="https://asset.roncoos.com/static/pc.png" class="login_ico" @click="switchLogin" alt="" />
-          <div v-if="isPwdLogin" class="login_pc">
-            <div class="login_form">
-              <div class="login_title">账号登录</div>
-              <el-form v-loading="loading" :model="loginForm" @keyup.enter="handleLogin()">
-                <div class="demo-notice">
-                  <el-alert
-                    title="演示模式"
-                    description="点击下方按钮即可直接登录体验系统"
-                    type="info"
-                    :closable="false"
-                    show-icon
-                  />
-                </div>
-                <el-form-item class="form-group" prop="mobile">
-                  <el-input v-model="loginForm.mobile" placeholder="手机号（可选）" />
-                </el-form-item>
-                <el-form-item class="form-group" prop="password">
-                  <el-input v-model="mobilePwd" placeholder="密码（可选）" type="password" show-password />
-                </el-form-item>
-                <el-form-item class="form-group" prop="verCode">
-                  <el-input v-model="loginForm.verCode" class="var-input" placeholder="验证码（可选）" />
-                  <img class="var-img" :src="verImg" @click="getCaptcha" />
-                </el-form-item>
-                <div class="login-info">
-                  <el-checkbox v-model="loginForm.isAgreement" size="default"> 登录即同意<span class="blue_text" @click="loginForm.visible = true">《隐私政策》</span> </el-checkbox>
-                  <nuxt-link :to="{ name: 'reset' }">
-                    <div class="login-info-reset">忘记密码？</div>
-                  </nuxt-link>
-                </div>
-                <el-button class="login-button" type="primary" size="large" @click="handleLogin">
-                  🚀 演示登录
-                </el-button>
-              </el-form>
-              <div class="login_other">
-                <nuxt-link :to="{ name: 'register' }"> 没有账号，我要注册</nuxt-link>
+  <div class="login_body">
+    <div class="login_box">
+      <div class="login_logo">
+        <img src="../assets/image/common_login.png" alt="" />
+      </div>
+      <div class="login_content">
+        <img v-if="isPwdLogin && websiteInfo?.wxPcLoginEnable === '1'" src="https://asset.roncoos.com/static/qr.png" class="login_ico" @click="switchLogin" alt="" />
+        <img v-if="!isPwdLogin && websiteInfo?.wxPcLoginEnable === '1'" src="https://asset.roncoos.com/static/pc.png" class="login_ico" @click="switchLogin" alt="" />
+        <div v-if="isPwdLogin" class="login_pc">
+          <div class="login_form">
+            <div class="login_title">账号登录</div>
+            <el-form v-loading="loading" :model="loginForm" @keyup.enter="handleLogin()">
+              <div class="demo-notice">
+                <el-alert
+                  title="演示模式"
+                  description="点击下方按钮即可直接登录体验系统"
+                  type="info"
+                  :closable="false"
+                  show-icon
+                />
               </div>
+              <el-form-item class="form-group" prop="mobile">
+                <el-input v-model="loginForm.mobile" placeholder="手机号（可选）" />
+              </el-form-item>
+              <el-form-item class="form-group" prop="password">
+                <el-input v-model="mobilePwd" placeholder="密码（可选）" type="password" show-password />
+              </el-form-item>
+              <el-form-item class="form-group" prop="verCode">
+                <el-input v-model="loginForm.verCode" class="var-input" placeholder="验证码（可选）" />
+                <img class="var-img" :src="verImg" @click="getCaptcha" />
+              </el-form-item>
+              <div class="login-info">
+                <el-checkbox v-model="loginForm.isAgreement" size="default"> 登录即同意<span class="blue_text" @click="loginForm.visible = true">《隐私政策》</span> </el-checkbox>
+                <nuxt-link :to="{ name: 'reset' }">
+                  <div class="login-info-reset">忘记密码？</div>
+                </nuxt-link>
+              </div>
+              <el-button class="login-button" type="primary" size="large" @click="handleLogin">
+                🚀 演示登录
+              </el-button>
+            </el-form>
+            <div class="login_other">
+              <nuxt-link :to="{ name: 'register' }"> 没有账号，我要注册</nuxt-link>
             </div>
           </div>
-          <div v-if="!isPwdLogin" class="login_app">
-            <iframe v-if="!binding" :src="wxLoginUrl" class="login_iframe" />
-            <div v-if="binding" class="login_form">
-              <div class="login_title">账号绑定</div>
-              <el-form v-loading="loading" :model="bindingForm" @keyup.enter="handleBinding()">
-                <el-form-item class="form-group" prop="mobile">
-                  <el-input v-model="bindingForm.mobile" placeholder="手机号" autofocus />
-                </el-form-item>
-                <el-form-item prop="code">
-                  <el-input v-model="bindingForm.code" placeholder="验证码">
-                    <template #suffix>
-                      <el-button link type="primary" @click="getCode"> 获取验证码</el-button>
-                    </template>
-                  </el-input>
-                </el-form-item>
-                <div style="color: #999; margin-bottom: 74px">若手机号没注册，则会自动注册</div>
-                <el-button class="login-button" type="primary" size="large" @click="handleBinding()"> 绑定登录 </el-button>
-              </el-form>
-            </div>
+        </div>
+        <div v-if="!isPwdLogin" class="login_app">
+          <iframe v-if="!binding" :src="wxLoginUrl" class="login_iframe" />
+          <div v-if="binding" class="login_form">
+            <div class="login_title">账号绑定</div>
+            <el-form v-loading="loading" :model="bindingForm" @keyup.enter="handleBinding()">
+              <el-form-item class="form-group" prop="mobile">
+                <el-input v-model="bindingForm.mobile" placeholder="手机号" autofocus />
+              </el-form-item>
+              <el-form-item prop="code">
+                <el-input v-model="bindingForm.code" placeholder="验证码">
+                  <template #suffix>
+                    <el-button link type="primary" @click="getCode"> 获取验证码</el-button>
+                  </template>
+                </el-input>
+              </el-form-item>
+              <div style="color: #999; margin-bottom: 74px">若手机号没注册，则会自动注册</div>
+              <el-button class="login-button" type="primary" size="large" @click="handleBinding()"> 绑定登录 </el-button>
+            </el-form>
           </div>
         </div>
       </div>
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 <script setup>
   import { loginApi } from '~/api/login.js'
@@ -105,7 +103,7 @@
     websiteDesc: '专业的AI编程在线学习平台',
     rsaLoginPublicKey: 'mock_public_key',
     wxPcLoginEnable: '1',
-    websiteDomain: 'http://localhost:3001/'
+    websiteDomain: 'https://localhost:3000/'
   })
 
   useHead({

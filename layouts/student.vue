@@ -113,7 +113,7 @@ import {
 } from '@element-plus/icons-vue'
 
 // 导入 Vue 相关的 hooks
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 // 导入 Vue Router 相关的 hooks
 import { useRouter, useRoute } from 'vue-router'
 // 导入 Element Plus 的组件
@@ -167,10 +167,13 @@ const handleNavClick = (key) => {
   
   // 切换导航时滚动到顶部
   if (process.client) {
-    const mainContent = document.querySelector('.main-content')
-    if (mainContent) {
-      mainContent.scrollTop = 0
-    }
+    // 延迟执行，确保DOM已渲染
+    nextTick(() => {
+      const mainContent = document.querySelector('.main-content')
+      if (mainContent) {
+        mainContent.scrollTop = 0
+      }
+    })
   }
 }
 

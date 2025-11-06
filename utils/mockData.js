@@ -6,7 +6,7 @@ export const websiteInfo = {
   websiteDesc: '专业的AI编程在线学习平台，提供高质量的课程内容',
   rsaLoginPublicKey: 'mock_public_key',
   wxPcLoginEnable: '1',
-  websiteDomain: 'http://localhost:3001/'
+  websiteDomain: 'https://localhost:3000/'
 }
 
 // 模拟讲师数据

@@ -1,24 +1,19 @@
 <script setup>
-import { Loading } from '@element-plus/icons-vue'
-
-// 学生中心首页 - 默认重定向到课程页面
+// 学生中心首页 - 重定向到课程页面
 definePageMeta({
   layout: 'student',
   // middleware: ['auth'], // 暂时注释，开发时使用
   title: '学生中心'
 })
 
-// 使用 onMounted 进行重定向
-onMounted(() => {
+// 在客户端重定向
+if (process.client) {
   navigateTo('/student/course', { replace: true })
-})
+}
 </script>
 
 <template>
-  <div class="loading">
-    <el-icon class="is-loading" :size="40">
-      <Loading />
-    </el-icon>
+  <div class="redirecting">
     <p>正在跳转到课程页面...</p>
   </div>
 </template>
