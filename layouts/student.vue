@@ -185,7 +185,7 @@ const isCoursePage = computed(() => {
 })
 
 const currentCourseId = computed(() => {
-  return isCoursePage.value ? parseInt(route.params.id) : null
+  return isCoursePage.value && route.params.id ? parseInt(route.params.id) : null
 })
 
 const currentCourseTitle = ref('')
@@ -216,7 +216,10 @@ const goBackToCourseHub = () => {
 }
 
 const navigateToCoursePage = (pageKey) => {
-  if (!currentCourseId.value) return
+  if (!currentCourseId.value || isNaN(currentCourseId.value)) {
+    console.warn('无效的课程ID:', currentCourseId.value)
+    return
+  }
 
   const routeMap = {
     hub: `/student/course/${currentCourseId.value}`,

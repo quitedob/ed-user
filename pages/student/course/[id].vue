@@ -84,9 +84,9 @@ const tabs = [
 // 当前激活的标签
 const activeTab = ref('chapters')
 
-// 判断是否是学习页面（学习页面和考试详情页不显示课程头部和侧边栏）
+// 判断是否是学习页面（学习页面、考试详情页和作业详情页不显示课程头部和侧边栏）
 const isLearningPage = computed(() => {
-  return route.path.includes('/section/') || route.path.match(/\/exam\/\d+/)
+  return route.path.includes('/section/') || route.path.match(/\/exam\/\d+/) || route.path.match(/\/homework\/\d+/)
 })
 
 // 切换标签

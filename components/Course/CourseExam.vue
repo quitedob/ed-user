@@ -202,7 +202,7 @@ const router = useRouter()
 const courseId = computed(() => parseInt(route.params.id) || 1)
 
 const startExam = (examId) => {
-  router.push(`/student/exam/${examId}`)
+  router.push(`/student/course/${courseId.value}/exam/${examId}`)
 }
 
 const viewExamResult = (examId) => {
