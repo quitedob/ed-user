@@ -127,7 +127,7 @@
           <el-tab-pane label="目录" name="outline">
             <div class="course-outline">
               <div
-                v-for="chapter in chapters"
+                v-for="chapter in courseInfo.chapters"
                 :key="chapter.id"
                 class="outline-chapter"
               >
@@ -140,10 +140,10 @@
                     :key="section.id"
                     class="outline-section"
                     :class="{
-                      active: section.id === sectionId,
+                      active: section.id === sectionInfo.id || parseInt(section.id.replace('section_', '')) === sectionId,
                       completed: section.completed
                     }"
-                    @click="goToSection(section.id)"
+                    @click="goToSection(parseInt(section.id.replace('section_', '')))"
                   >
                     <el-icon v-if="section.completed" color="#67c23a" class="section-icon">
                       <Check />
@@ -211,14 +211,60 @@ const videoPlayer = ref(null)
 
 
 
-// 当前课时信息
+// 课程信息 - 采用JSON格式规范
+const courseInfo = ref({
+  id: courseId.value,
+  type: 'course',
+  metadata: {
+    version: '1.0',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-15T10:30:00Z',
+    createdBy: 'teacher_001',
+    courseId: courseId.value
+  },
+  basicInfo: {
+    title: '软件工程导论',
+    description: '本课程介绍软件工程的基本概念和开发方法',
+    cover: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400',
+    duration: 48,
+    level: 'intermediate',
+    teacher: {
+      id: 'teacher_001',
+      name: '李教授',
+      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+    },
+    tags: ['软件工程', '编程', '计算机']
+  },
+  schedule: {
+    startDate: '2024-08-31',
+    endDate: '2025-06-30',
+    publishStatus: 'published'
+  },
+  chapters: []
+})
+
+// 当前课时信息 - 采用JSON格式规范中的section结构
 const sectionInfo = ref({
-  id: sectionId.value,
+  id: '',
+  number: '',
   title: '',
-  chapterTitle: '',
+  description: '',
+  order: 0,
+  contentType: 'video',
+  contentUrl: '',
+  duration: 0,
+  resources: {
+    materials: [],
+    attachments: []
+  },
+  practice: {
+    practiceId: '',
+    questions: 0,
+    optional: false
+  },
   progress: 0,
   completed: false,
-  contentBlocks: [] // 内容块数组，可以包含多个视频、PDF、文本、题目
+  contentBlocks: [] // 兼容现有的内容块结构
 })
 
 // 导航状态
@@ -227,9 +273,6 @@ const hasNextSection = ref(false)
 
 // 右侧标签页
 const activeTab = ref('outline')
-
-// 章节数据
-const chapters = ref([])
 
 // 方法
 const goToSection = (targetSectionId) => {
@@ -311,162 +354,371 @@ const loadData = async () => {
 }
 
 const loadChaptersData = () => {
-  // 模拟章节数据
+  // 采用JSON格式规范的章节数据
   const chaptersData = [
     {
-      id: 1,
-      number: '第一章',
+      id: 'chapter_001',
+      number: '1',
       title: '软件工程概述',
+      description: '介绍软件工程的基本概念和发展历程',
+      order: 1,
       sections: [
-        { id: 1, number: '1.1', title: '软件工程的基本概念', completed: true },
-        { id: 2, number: '1.2', title: '软件生命周期模型', completed: false }
+        {
+          id: 'section_001',
+          number: '1.1',
+          title: '软件工程的基本概念',
+          description: '什么是软件工程，软件工程的定义和特征',
+          order: 1,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 1800,
+          resources: {
+            materials: [
+              {
+                id: 'material_001',
+                type: 'pdf',
+                title: '课件讲义',
+                url: '/sample.pdf'
+              }
+            ],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_001',
+            questions: 5,
+            optional: false
+          },
+          completed: true
+        },
+        {
+          id: 'section_002',
+          number: '1.2',
+          title: '软件生命周期模型',
+          description: '瀑布模型、敏捷开发等软件生命周期模型',
+          order: 2,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 2400,
+          resources: {
+            materials: [
+              {
+                id: 'material_002',
+                type: 'pdf',
+                title: '生命周期模型对比',
+                url: '/sample.pdf'
+              }
+            ],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_002',
+            questions: 3,
+            optional: false
+          },
+          completed: false
+        }
       ]
     },
     {
-      id: 2,
-      number: '第二章',
+      id: 'chapter_002',
+      number: '2',
       title: '需求分析',
+      description: '需求获取、分析、规格说明和验证',
+      order: 2,
       sections: [
-        { id: 3, number: '2.1', title: '需求获取', completed: false },
-        { id: 4, number: '2.2', title: '需求分析', completed: false },
-        { id: 5, number: '2.3', title: '需求规格说明', completed: false },
-        { id: 6, number: '2.4', title: '需求验证', completed: false }
+        {
+          id: 'section_003',
+          number: '2.1',
+          title: '需求获取',
+          description: '需求获取的方法和技巧',
+          order: 1,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 2100,
+          resources: {
+            materials: [],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_003',
+            questions: 4,
+            optional: false
+          },
+          completed: false
+        },
+        {
+          id: 'section_004',
+          number: '2.2',
+          title: '需求分析',
+          description: '需求分析的方法和工具',
+          order: 2,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 1800,
+          resources: {
+            materials: [],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_004',
+            questions: 6,
+            optional: false
+          },
+          completed: false
+        },
+        {
+          id: 'section_005',
+          number: '2.3',
+          title: '需求规格说明',
+          description: '如何编写需求规格说明书',
+          order: 3,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 1600,
+          resources: {
+            materials: [],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_005',
+            questions: 3,
+            optional: false
+          },
+          completed: false
+        },
+        {
+          id: 'section_006',
+          number: '2.4',
+          title: '需求验证',
+          description: '需求验证的方法和标准',
+          order: 4,
+          contentType: 'video',
+          contentUrl: '/sample.mp4',
+          duration: 1900,
+          resources: {
+            materials: [],
+            attachments: []
+          },
+          practice: {
+            practiceId: 'practice_006',
+            questions: 4,
+            optional: false
+          },
+          completed: false
+        }
       ]
     }
   ]
 
-  chapters.value = chaptersData
+  courseInfo.value.chapters = chaptersData
 }
 
 const loadSectionData = () => {
-  // 模拟课时数据 - 每个章节包含多个内容块
-  const sectionData = {
-    1: {
-      title: '第一章 软件工程概述',
-      chapterTitle: '第一章 软件工程概述',
-      progress: 0,
-      completed: false,
-      contentBlocks: [
-        // 视频块
-        {
-          type: 'video',
-          id: 'video-1',
-          title: '软件工程概述视频',
-          description: '介绍软件工程的基本概念、发展历程和核心原则',
-          videoUrl: '/sample.mp4',
-          cover: '/images/common_head.jpg',
-          durationInSeconds: 2700,
-          subtitles: [
-            {
-              id: 'zh',
-              label: '中文字幕',
-              language: 'zh',
-              data: [
-                { start: 5, end: 8, text: '欢迎使用软件工程课程' },
-                { start: 10, end: 15, text: '今天我们将学习软件工程的基本概念' }
-              ]
-            }
-          ],
-          coursewareSync: {
-            enabled: true,
-            pages: [
-              { pageNumber: 1, startTime: 0, endTime: 180, title: '课程封面', content: '软件工程导论' },
-              { pageNumber: 2, startTime: 180, endTime: 600, title: '软件工程定义', content: '定义和特征' }
-            ]
-          }
-        },
-        // 富文本块
-        {
-          type: 'text',
-          title: '软件工程基本概念',
-          content: `
-            <h2>软件工程基本概念</h2>
-            <p>软件工程是应用系统化、规范化、可量化的方法来开发、运行和维护软件的工程学科。</p>
-            <h3>核心原则</h3>
-            <ul>
-              <li>模块化设计</li>
-              <li>抽象化思维</li>
-              <li>信息隐藏</li>
-            </ul>
-          `
-        },
-        // 题目块
-        {
-          type: 'quiz',
-          title: '知识点测试',
-          quizType: '单选题',
-          quizScore: 10,
-          question: '软件工程的核心目标是什么？',
-          options: [
-            { text: '提高开发速度', isCorrect: false },
-            { text: '降低开发成本', isCorrect: false },
-            { text: '提高软件质量和可维护性', isCorrect: true },
-            { text: '增加代码量', isCorrect: false }
-          ],
-          selectedOption: null,
-          showAnswer: false,
-          isCorrect: false
-        }
-      ]
-    },
-    2: {
-      title: '第二章 需求分析',
-      chapterTitle: '第二章 需求分析',
-      progress: 0,
-      completed: false,
-      contentBlocks: [
-        // 视频块
-        {
-          type: 'video',
-          id: 'video-2',
-          title: '需求分析方法',
-          description: '介绍需求获取和分析的方法',
-          videoUrl: '/sample.mp4',
-          cover: '/images/logo.png',
-          durationInSeconds: 1800,
-          subtitles: []
-        },
-        // PDF块
-        {
-          type: 'pdf',
-          title: '需求分析文档模板',
-          pdfUrl: '/sample.pdf'
-        },
-        // 题目块
-        {
-          type: 'quiz',
-          title: '需求分析测试',
-          quizType: '单选题',
-          quizScore: 10,
-          question: '为使一个软件能在不同的环境下运行，应当对软件的（）进行修改。',
-          options: [
-            { text: '适应性', isCorrect: false },
-            { text: '可移植性', isCorrect: true },
-            { text: '可靠性', isCorrect: false },
-            { text: '可维护性', isCorrect: false }
-          ],
-          selectedOption: null,
-          showAnswer: false,
-          isCorrect: false
-        }
-      ]
+  // 从JSON格式规范的数据中查找当前章节
+  let targetSection = null
+  let chapterTitle = ''
+
+  // 遍历所有章节查找目标section
+  for (const chapter of courseInfo.value.chapters) {
+    const section = chapter.sections.find(s =>
+      s.id === `section_${sectionId.value.toString().padStart(3, '0')}` ||
+      s.id === `section_${sectionId.value}` ||
+      parseInt(s.id.replace('section_', '')) === sectionId.value
+    )
+
+    if (section) {
+      targetSection = section
+      chapterTitle = `${chapter.number} ${chapter.title}`
+      break
     }
   }
 
-  const section = sectionData[sectionId.value]
-  if (section) {
-    sectionInfo.value = { ...section, id: sectionId.value }
+  if (targetSection) {
+    // 映射JSON格式到现有的展示结构
+    sectionInfo.value = {
+      id: targetSection.id,
+      number: targetSection.number,
+      title: targetSection.title,
+      description: targetSection.description,
+      order: targetSection.order,
+      contentType: targetSection.contentType,
+      contentUrl: targetSection.contentUrl,
+      duration: targetSection.duration,
+      resources: targetSection.resources,
+      practice: targetSection.practice,
+      progress: 0,
+      completed: targetSection.completed,
+      chapterTitle: chapterTitle,
+      contentBlocks: generateContentBlocks(targetSection)
+    }
   } else {
     // 默认数据
     sectionInfo.value = {
-      id: sectionId.value,
+      id: `section_${sectionId.value}`,
+      number: `1.${sectionId.value}`,
       title: '章节内容',
-      chapterTitle: '章节',
+      description: '章节描述',
+      order: sectionId.value,
+      contentType: 'video',
+      contentUrl: '/sample.mp4',
+      duration: 1800,
+      resources: {
+        materials: [],
+        attachments: []
+      },
+      practice: {
+        practiceId: '',
+        questions: 0,
+        optional: false
+      },
       progress: 0,
       completed: false,
+      chapterTitle: '章节',
       contentBlocks: []
     }
   }
+}
+
+// 根据JSON格式数据生成内容块
+const generateContentBlocks = (section) => {
+  const blocks = []
+
+  // 视频块
+  if (section.contentType === 'video' && section.contentUrl) {
+    blocks.push({
+      type: 'video',
+      id: `video-${section.id}`,
+      title: section.title,
+      description: section.description,
+      videoUrl: section.contentUrl, // 使用本地的sample.mp4
+      cover: '/images/common_head.jpg',
+      durationInSeconds: section.duration,
+      subtitles: [
+        {
+          id: 'zh',
+          label: '中文字幕',
+          language: 'zh',
+          data: [
+            { start: 5, end: 8, text: '欢迎使用软件工程课程' },
+            { start: 10, end: 15, text: '今天我们将学习软件工程的基本概念' }
+          ]
+        }
+      ],
+      coursewareSync: {
+        enabled: true,
+        pages: [
+          { pageNumber: 1, startTime: 0, endTime: 180, title: '课程封面', content: section.title },
+          { pageNumber: 2, startTime: 180, endTime: 600, title: '内容讲解', content: section.description }
+        ]
+      }
+    })
+  }
+
+  // 材料块 - PDF课件
+  if (section.resources.materials && section.resources.materials.length > 0) {
+    section.resources.materials.forEach(material => {
+      if (material.type === 'pdf') {
+        blocks.push({
+          type: 'pdf',
+          title: material.title,
+          pdfUrl: material.url || '/sample.pdf'
+        })
+      } else if (material.type === 'text') {
+        blocks.push({
+          type: 'text',
+          title: material.title,
+          content: `
+            <h2>${material.title}</h2>
+            <p>${section.description}</p>
+            <h3>核心概念</h3>
+            <ul>
+              <li>软件工程基本概念</li>
+              <li>开发方法和流程</li>
+              <li>质量保证措施</li>
+            </ul>
+          `
+        })
+      }
+    })
+  }
+
+  // 题目块
+  if (section.practice && section.practice.questions > 0) {
+    blocks.push({
+      type: 'quiz',
+      title: '知识点测试',
+      quizType: '单选题',
+      quizScore: 10,
+      question: getQuizQuestion(section.id),
+      options: getQuizOptions(section.id),
+      selectedOption: null,
+      showAnswer: false,
+      isCorrect: false
+    })
+  }
+
+  return blocks
+}
+
+// 根据章节ID生成对应的题目
+const getQuizQuestion = (sectionId) => {
+  const questions = {
+    'section_001': '软件工程的核心目标是什么？',
+    'section_002': '以下哪个不属于软件生命周期模型？',
+    'section_003': '需求获取的最主要方法是？',
+    'section_004': '数据流图主要用于描述？',
+    'section_005': '需求规格说明书的编写原则不包括？',
+    'section_006': '需求验证的主要目的是？'
+  }
+  return questions[sectionId] || '请根据本节内容回答相关问题。'
+}
+
+// 根据章节ID生成对应的选项
+const getQuizOptions = (sectionId) => {
+  const options = {
+    'section_001': [
+      { text: '提高开发速度', isCorrect: false },
+      { text: '降低开发成本', isCorrect: false },
+      { text: '提高软件质量和可维护性', isCorrect: true },
+      { text: '增加代码量', isCorrect: false }
+    ],
+    'section_002': [
+      { text: '瀑布模型', isCorrect: false },
+      { text: '敏捷开发', isCorrect: false },
+      { text: '螺旋模型', isCorrect: false },
+      { text: '随机模型', isCorrect: true }
+    ],
+    'section_003': [
+      { text: '查阅文档', isCorrect: false },
+      { text: '访谈用户', isCorrect: true },
+      { text: '代码分析', isCorrect: false },
+      { text: '测试验证', isCorrect: false }
+    ],
+    'section_004': [
+      { text: '数据结构', isCorrect: false },
+      { text: '数据变换', isCorrect: true },
+      { text: '算法逻辑', isCorrect: false },
+      { text: '界面设计', isCorrect: false }
+    ],
+    'section_005': [
+      { text: '完整性', isCorrect: false },
+      { text: '一致性', isCorrect: false },
+      { text: '可修改性', isCorrect: false },
+      { text: '复杂性', isCorrect: true }
+    ],
+    'section_006': [
+      { text: '检查文档格式', isCorrect: false },
+      { text: '确认需求正确性', isCorrect: true },
+      { text: '评估开发难度', isCorrect: false },
+      { text: '制定开发计划', isCorrect: false }
+    ]
+  }
+  return options[sectionId] || [
+    { text: '选项A', isCorrect: false },
+    { text: '选项B', isCorrect: false },
+    { text: '选项C', isCorrect: true },
+    { text: '选项D', isCorrect: false }
+  ]
 }
 
 const updateNavigationState = () => {

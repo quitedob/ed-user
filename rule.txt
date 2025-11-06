@@ -1,0 +1,421 @@
+# JSON数据格式规范
+
+## 概述
+本项目采用统一的JSON数据格式规范，用于课程、作业、考试等教育内容的数据交换和存储。
+
+## 1. 课程 (Course) JSON格式
+
+### 1.1 课程基础信息结构
+```json
+{
+  "id": "course_001",
+  "type": "course",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001"
+  },
+  "basicInfo": {
+    "title": "软件工程导论",
+    "description": "本课程介绍软件工程的基本概念...",
+    "cover": "https://cdn.example.com/courses/course_001.jpg",
+    "duration": 48,
+    "level": "intermediate",
+    "teacher": {
+      "id": "teacher_001",
+      "name": "李教授",
+      "avatar": "https://cdn.example.com/avatars/teacher_001.jpg"
+    },
+    "tags": ["软件工程", "编程", "计算机"]
+  },
+  "schedule": {
+    "startDate": "2024-08-31",
+    "endDate": "2025-06-30",
+    "publishStatus": "published"
+  },
+  "chapters": [
+    {
+      "id": "chapter_001",
+      "number": 1,
+      "title": "第一章：软件工程基础",
+      "description": "介绍软件工程的基本概念",
+      "order": 1,
+      "sections": [
+        {
+          "id": "section_001",
+          "number": "1.1",
+          "title": "软件工程概述",
+          "description": "什么是软件工程",
+          "order": 1,
+          "contentType": "video",
+          "contentUrl": "https://video.example.com/section_001.mp4",
+          "duration": 1800,
+          "resources": {
+            "materials": [
+              {
+                "id": "material_001",
+                "type": "pdf",
+                "title": "课件讲义",
+                "url": "https://cdn.example.com/materials/material_001.pdf"
+              }
+            ],
+            "attachments": []
+          },
+          "practice": {
+            "practiceId": "practice_001",
+            "questions": 5,
+            "optional": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+## 2. 作业 (Homework) JSON格式
+
+### 2.1 作业基础信息结构
+```json
+{
+  "id": "homework_001",
+  "type": "homework",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001",
+    "courseId": "course_001"
+  },
+  "basicInfo": {
+    "title": "第一周作业",
+    "description": "完成软件工程基础的练习题",
+    "type": "exercise",
+    "difficulty": "easy"
+  },
+  "schedule": {
+    "releaseDate": "2024-09-01T00:00:00Z",
+    "dueDate": "2024-09-07T23:59:59Z",
+    "remindDate": "2024-09-06T12:00:00Z"
+  },
+  "questions": [
+    {
+      "id": "question_001",
+      "type": "single",
+      "questionText": "什么是软件工程的三要素？",
+      "score": 5,
+      "difficulty": "easy",
+      "order": 1,
+      "options": [
+        {
+          "id": "opt_a",
+          "value": "A",
+          "text": "方法、工具、过程"
+        },
+        {
+          "id": "opt_b",
+          "value": "B",
+          "text": "代码、文档、测试"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "软件工程的三要素是方法、工具和过程",
+      "knowledgePoints": ["软件工程基础"]
+    },
+    {
+      "id": "question_002",
+      "type": "multiple",
+      "questionText": "软件生命周期包括哪些阶段？",
+      "score": 10,
+      "difficulty": "medium",
+      "order": 2,
+      "options": [
+        {
+          "id": "opt_a",
+          "value": "A",
+          "text": "需求分析"
+        },
+        {
+          "id": "opt_b",
+          "value": "B",
+          "text": "系统设计"
+        },
+        {
+          "id": "opt_c",
+          "value": "C",
+          "text": "编码实现"
+        },
+        {
+          "id": "opt_d",
+          "value": "D",
+          "text": "测试维护"
+        }
+      ],
+      "correctAnswers": ["A", "B", "C", "D"],
+      "explanation": "软件生命周期包括需求分析、系统设计、编码实现和测试维护等阶段",
+      "knowledgePoints": ["软件生命周期"]
+    },
+    {
+      "id": "question_003",
+      "type": "fill",
+      "questionText": "软件工程的目标是提高软件的___和___。",
+      "score": 5,
+      "difficulty": "easy",
+      "order": 3,
+      "correctAnswers": ["质量", "可维护性"],
+      "knowledgePoints": ["软件工程基础"]
+    },
+    {
+      "id": "question_004",
+      "type": "essay",
+      "questionText": "请简述瀑布模型和敏捷开发的主要区别。",
+      "score": 15,
+      "difficulty": "hard",
+      "order": 4,
+      "referenceAnswer": "瀑布模型是线性顺序的开发方法，强调文档和计划；敏捷开发是迭代增量的开发方法，强调快速响应变化和持续交付。",
+      "knowledgePoints": ["开发模型"]
+    }
+  ],
+  "settings": {
+    "allowLateSubmission": true,
+    "latePenalty": 5,
+    "randomOrder": false,
+    "immediateGrading": true,
+    "showCorrectAnswers": true,
+    "reviewAfterSubmit": true
+  },
+  "statistics": {
+    "totalQuestions": 4,
+    "totalScore": 35,
+    "submissionCount": 25,
+    "averageScore": 28,
+    "completionRate": 92
+  }
+}
+```
+
+## 3. 考试 (Exam) JSON格式
+
+### 3.1 考试基础信息结构
+```json
+{
+  "id": "exam_001",
+  "type": "exam",
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z",
+    "createdBy": "teacher_001",
+    "courseId": "course_001"
+  },
+  "basicInfo": {
+    "title": "期中考试",
+    "description": "软件工程课程期中考试",
+    "type": "midterm",
+    "difficulty": "medium"
+  },
+  "schedule": {
+    "startTime": "2024-11-15T10:00:00Z",
+    "endTime": "2024-11-15T11:30:00Z",
+    "duration": 90,
+    "reviewStartTime": "2024-11-20T00:00:00Z"
+  },
+  "settings": {
+    "totalScore": 100,
+    "passingScore": 60,
+    "showScoreAfterSubmit": true,
+    "randomOrder": true,
+    "randomQuestions": true,
+    "questionsPerBank": 50,
+    "allowReview": true,
+    "reviewDelay": 86400,
+    "proctorRequired": false,
+    "cameraRequired": false
+  },
+  "questionBanks": [
+    {
+      "id": "bank_001",
+      "name": "单选题库",
+      "type": "single",
+      "questionCount": 20,
+      "scorePerQuestion": 2,
+      "totalQuestionsNeeded": 10,
+      "questions": [
+        {
+          "id": "question_001",
+          "questionText": "软件工程的核心目标是什么？",
+          "options": [
+            {
+              "id": "opt_a",
+              "value": "A",
+              "text": "提高开发速度"
+            },
+            {
+              "id": "opt_b",
+              "value": "B",
+              "text": "降低开发成本"
+            },
+            {
+              "id": "opt_c",
+              "value": "C",
+              "text": "提高软件质量和可维护性"
+            },
+            {
+              "id": "opt_d",
+              "value": "D",
+              "text": "增加代码量"
+            }
+          ],
+          "correctAnswer": "C",
+          "explanation": "软件工程的核心目标是通过系统的方法提高软件质量和可维护性",
+          "knowledgePoints": ["软件工程基础"],
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "id": "bank_002",
+      "name": "多选题库",
+      "type": "multiple",
+      "questionCount": 15,
+      "scorePerQuestion": 3,
+      "totalQuestionsNeeded": 5,
+      "questions": []
+    },
+    {
+      "id": "bank_003",
+      "name": "填空题库",
+      "type": "fill",
+      "questionCount": 10,
+      "scorePerQuestion": 5,
+      "totalQuestionsNeeded": 5,
+      "questions": []
+    },
+    {
+      "id": "bank_004",
+      "name": "问答题库",
+      "type": "essay",
+      "questionCount": 5,
+      "scorePerQuestion": 15,
+      "totalQuestionsNeeded": 2,
+      "questions": []
+    }
+  ],
+  "grading": {
+    "autoGrade": true,
+    "manualReviewRequired": true,
+    "essayReviewers": ["teacher_001", "teacher_002"],
+    "gradingDeadline": "2024-11-25T23:59:59Z"
+  }
+}
+```
+
+## 4. 题目类型规范
+
+### 4.1 单选题 (single)
+```json
+{
+  "type": "single",
+  "questionText": "题目内容",
+  "options": [
+    {
+      "id": "opt_a",
+      "value": "A",
+      "text": "选项内容"
+    }
+  ],
+  "correctAnswer": "A"
+}
+```
+
+### 4.2 多选题 (multiple)
+```json
+{
+  "type": "multiple",
+  "questionText": "题目内容",
+  "options": [
+    {
+      "id": "opt_a",
+      "value": "A",
+      "text": "选项内容"
+    }
+  ],
+  "correctAnswers": ["A", "B", "C"]
+}
+```
+
+### 4.3 填空题 (fill)
+```json
+{
+  "type": "fill",
+  "questionText": "题目内容",
+  "correctAnswers": ["答案1", "答案2"]
+}
+```
+
+### 4.4 问答题 (essay)
+```json
+{
+  "type": "essay",
+  "questionText": "题目内容",
+  "referenceAnswer": "参考答案"
+}
+```
+
+## 5. 项目实现现状
+
+### 5.1 已实现页面
+- ✅ `pages/student/course/[id]/section/[sectionId].vue` - 章节学习页
+- ✅ `pages/student/course/[id]/homework/[homeworkId].vue` - 作业详情页
+- ✅ `pages/student/course/[id]/exam/[exam].vue` - 考试详情页
+
+### 5.2 JSON格式使用情况
+- ✅ **metadata字段**: 所有页面都包含version、createdAt、updatedBy等元数据
+- ✅ **basicInfo字段**: 所有页面都包含title、description、type、difficulty等基础信息
+- ✅ **schedule字段**: 所有页面都包含时间安排信息
+- ✅ **settings字段**: 作业和考试页面包含设置信息
+- ✅ **题目格式**: 统一使用questionText、options、correctAnswer等字段
+- ✅ **题库结构**: 考试页面采用questionBanks结构
+
+### 5.3 路由路径使用规范
+**主要路径**: `/student/course/[id]/` - 学生门户路径
+- 章节学习: `/student/course/[id]/section/[sectionId]`
+- 作业列表: `/student/course/[id]/homework`
+- 作业详情: `/student/course/[id]/homework/[homeworkId]`
+- 考试列表: `/student/course/[id]/exam`
+- 考试详情: `/student/course/[id]/exam/[exam]`
+
+## 6. 开发规范
+
+### 6.1 命名规范
+- ID格式: `{type}_{number}` (如: course_001, homework_001, exam_001)
+- 选项ID: opt_{letter} (如: opt_a, opt_b)
+- 题目ID: question_{number} (如: question_001)
+
+### 6.2 时间格式
+- 使用ISO 8601格式: `2024-01-01T00:00:00Z`
+- 所有时间字段统一使用UTC时间
+
+### 6.3 分页和排序
+- order字段用于排序
+- 分页由前端处理，JSON提供完整数据
+
+## 7. 兼容性说明
+
+### 7.1 向后兼容
+- 支持渐进式迁移到新格式
+- 旧格式数据可在前端进行转换
+
+### 7.2 前端适配
+- 本地资源支持: 支持使用`/sample.mp4`等本地资源
+- 缓存机制: 支持localStorage缓存用户答题数据
+- 错误处理: 完善的错误处理和降级方案
+
+## 8. 更新日志
+
+### v1.0 (2024-01-15)
+- 初始版本发布
+- 定义课程、作业、考试JSON格式规范
+- 完成三个核心页面的JSON格式实现
+- 统一路由路径规范

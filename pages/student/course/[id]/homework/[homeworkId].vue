@@ -267,15 +267,15 @@ const homeworkId = computed(() => {
 // 引用
 const answerAreaRef = ref(null)
 
-// 作业信息
+// 作业信息 - 完全采用JSON格式规范
 const homeworkInfo = ref({
-  id: homeworkId.value,
+  id: `homework_${homeworkId.value.toString().padStart(3, '0')}`,
   type: 'homework',
   metadata: {
     version: '1.0',
-    createdAt: '',
-    updatedAt: '',
-    createdBy: '',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-15T10:30:00Z',
+    createdBy: 'teacher_001',
     courseId: courseId.value
   },
   basicInfo: {
@@ -285,9 +285,9 @@ const homeworkInfo = ref({
     difficulty: 'easy'
   },
   schedule: {
-    releaseDate: '',
-    dueDate: '',
-    remindDate: ''
+    releaseDate: '2024-09-01T00:00:00Z',
+    dueDate: '2024-12-31T23:59:59Z',
+    remindDate: '2024-12-30T12:00:00Z'
   },
   questions: [],
   settings: {
@@ -301,9 +301,9 @@ const homeworkInfo = ref({
   statistics: {
     totalQuestions: 0,
     totalScore: 0,
-    submissionCount: 0,
-    averageScore: 0,
-    completionRate: 0
+    submissionCount: 25,
+    averageScore: 28,
+    completionRate: 92
   }
 })
 
@@ -476,13 +476,127 @@ const submitHomework = () => {
   }
 }
 
-// 加载作业数据
+// 加载作业数据 - 完全采用JSON格式规范
 const loadHomeworkData = () => {
   console.log('加载作业数据 - homeworkId:', homeworkId.value, 'courseId:', courseId.value)
-  
-  // 模拟作业数据（基于新的JSON格式）
+
+  // 根据homeworkId生成不同的作业数据
+  const homeworkTemplates = {
+    1: {
+      basicInfo: {
+        title: '第一周作业 - 软件工程基础',
+        description: '完成软件工程基本概念的练习题，包括单选题、多选题、填空题和问答题',
+        type: 'exercise',
+        difficulty: 'easy'
+      },
+      questions: [
+        {
+          id: 'question_001',
+          type: 'single',
+          questionText: '什么是软件工程的三要素？',
+          score: 5,
+          difficulty: 'easy',
+          order: 1,
+          options: [
+            { id: 'opt_a', value: 'A', text: '方法、工具、过程' },
+            { id: 'opt_b', value: 'B', text: '代码、文档、测试' },
+            { id: 'opt_c', value: 'C', text: '需求、设计、实现' },
+            { id: 'opt_d', value: 'D', text: '计划、执行、验收' }
+          ],
+          correctAnswer: 'A',
+          explanation: '软件工程的三要素是方法、工具和过程',
+          knowledgePoints: ['软件工程基础'],
+          userAnswer: ''
+        },
+        {
+          id: 'question_002',
+          type: 'multiple',
+          questionText: '软件生命周期包括哪些阶段？',
+          score: 10,
+          difficulty: 'medium',
+          order: 2,
+          options: [
+            { id: 'opt_a', value: 'A', text: '需求分析' },
+            { id: 'opt_b', value: 'B', text: '系统设计' },
+            { id: 'opt_c', value: 'C', text: '编码实现' },
+            { id: 'opt_d', value: 'D', text: '测试维护' }
+          ],
+          correctAnswers: ['A', 'B', 'C', 'D'],
+          explanation: '软件生命周期包括需求分析、系统设计、编码实现和测试维护等阶段',
+          knowledgePoints: ['软件生命周期'],
+          userAnswer: []
+        },
+        {
+          id: 'question_003',
+          type: 'fill',
+          questionText: '软件工程的目标是提高软件的___和___。',
+          score: 5,
+          difficulty: 'easy',
+          order: 3,
+          correctAnswers: ['质量', '可维护性'],
+          knowledgePoints: ['软件工程基础'],
+          userAnswer: ''
+        },
+        {
+          id: 'question_004',
+          type: 'essay',
+          questionText: '请简述瀑布模型和敏捷开发的主要区别。',
+          score: 15,
+          difficulty: 'hard',
+          order: 4,
+          referenceAnswer: '瀑布模型是线性顺序的开发方法，强调文档和计划；敏捷开发是迭代增量的开发方法，强调快速响应变化和持续交付。',
+          knowledgePoints: ['开发模型'],
+          userAnswer: ''
+        }
+      ]
+    },
+    2: {
+      basicInfo: {
+        title: '第二周作业 - 需求分析',
+        description: '完成需求分析相关的练习题',
+        type: 'exercise',
+        difficulty: 'medium'
+      },
+      questions: [
+        {
+          id: 'question_005',
+          type: 'single',
+          questionText: '需求获取的最主要方法是？',
+          score: 5,
+          difficulty: 'easy',
+          order: 1,
+          options: [
+            { id: 'opt_a', value: 'A', text: '查阅文档' },
+            { id: 'opt_b', value: 'B', text: '访谈用户' },
+            { id: 'opt_c', value: 'C', text: '代码分析' },
+            { id: 'opt_d', value: 'D', text: '测试验证' }
+          ],
+          correctAnswer: 'B',
+          explanation: '访谈用户是获取需求最直接有效的方法',
+          knowledgePoints: ['需求获取'],
+          userAnswer: ''
+        },
+        {
+          id: 'question_006',
+          type: 'fill',
+          questionText: '数据流图用于描述系统的___变换。',
+          score: 8,
+          difficulty: 'medium',
+          order: 2,
+          correctAnswers: ['数据'],
+          knowledgePoints: ['需求分析'],
+          userAnswer: ''
+        }
+      ]
+    }
+  }
+
+  // 获取当前作业的模板数据
+  const template = homeworkTemplates[homeworkId.value] || homeworkTemplates[1]
+
+  // 构建完整的JSON格式作业数据
   const mockData = {
-    id: homeworkId.value,
+    id: `homework_${homeworkId.value.toString().padStart(3, '0')}`,
     type: 'homework',
     metadata: {
       version: '1.0',
@@ -492,76 +606,16 @@ const loadHomeworkData = () => {
       courseId: courseId.value
     },
     basicInfo: {
-      title: '第一周作业',
-      description: '完成软件工程基础的练习题',
+      ...template.basicInfo,
       type: 'exercise',
-      difficulty: 'easy'
+      difficulty: template.basicInfo.difficulty
     },
     schedule: {
       releaseDate: '2024-09-01T00:00:00Z',
       dueDate: '2024-12-31T23:59:59Z',
       remindDate: '2024-12-30T12:00:00Z'
     },
-    questions: [
-      {
-        id: 'question_001',
-        type: 'single',
-        questionText: '什么是软件工程的三要素？',
-        score: 5,
-        difficulty: 'easy',
-        order: 1,
-        options: [
-          { id: 'opt_a', value: 'A', text: '方法、工具、过程' },
-          { id: 'opt_b', value: 'B', text: '代码、文档、测试' },
-          { id: 'opt_c', value: 'C', text: '需求、设计、实现' },
-          { id: 'opt_d', value: 'D', text: '计划、执行、验收' }
-        ],
-        correctAnswer: 'A',
-        explanation: '软件工程的三要素是方法、工具和过程',
-        knowledgePoints: ['软件工程基础'],
-        userAnswer: ''
-      },
-      {
-        id: 'question_002',
-        type: 'multiple',
-        questionText: '软件生命周期包括哪些阶段？',
-        score: 10,
-        difficulty: 'medium',
-        order: 2,
-        options: [
-          { id: 'opt_a', value: 'A', text: '需求分析' },
-          { id: 'opt_b', value: 'B', text: '系统设计' },
-          { id: 'opt_c', value: 'C', text: '编码实现' },
-          { id: 'opt_d', value: 'D', text: '测试维护' }
-        ],
-        correctAnswers: ['A', 'B', 'C', 'D'],
-        explanation: '软件生命周期包括需求分析、系统设计、编码实现和测试维护等阶段',
-        knowledgePoints: ['软件生命周期'],
-        userAnswer: []
-      },
-      {
-        id: 'question_003',
-        type: 'fill',
-        questionText: '软件工程的目标是提高软件的___和___。',
-        score: 5,
-        difficulty: 'easy',
-        order: 3,
-        correctAnswers: ['质量', '可维护性'],
-        knowledgePoints: ['软件工程基础'],
-        userAnswer: ''
-      },
-      {
-        id: 'question_004',
-        type: 'essay',
-        questionText: '请简述瀑布模型和敏捷开发的主要区别。',
-        score: 15,
-        difficulty: 'hard',
-        order: 4,
-        referenceAnswer: '瀑布模型是线性顺序的开发方法，强调文档和计划；敏捷开发是迭代增量的开发方法，强调快速响应变化和持续交付。',
-        knowledgePoints: ['开发模型'],
-        userAnswer: ''
-      }
-    ],
+    questions: template.questions,
     settings: {
       allowLateSubmission: true,
       latePenalty: 5,
@@ -571,8 +625,8 @@ const loadHomeworkData = () => {
       reviewAfterSubmit: true
     },
     statistics: {
-      totalQuestions: 4,
-      totalScore: 35,
+      totalQuestions: template.questions.length,
+      totalScore: template.questions.reduce((sum, q) => sum + q.score, 0),
       submissionCount: 25,
       averageScore: 28,
       completionRate: 92
@@ -589,13 +643,13 @@ const loadHomeworkData = () => {
       const completedIds = JSON.parse(completed)
       if (completedIds.includes(homeworkId.value)) {
         isCompleted.value = true
-        
+
         // 加载已保存的答题数据
         const savedData = localStorage.getItem(`homework_${homeworkId.value}_data`)
         if (savedData) {
           const data = JSON.parse(savedData)
           userScore.value = data.totalScore
-          
+
           // 恢复用户答案
           data.answers.forEach(answer => {
             const question = homeworkInfo.value.questions.find(q => q.id === answer.questionId)

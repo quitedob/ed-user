@@ -3,11 +3,11 @@
     <!-- 顶部导航栏 -->
     <div class="exam-header">
       <div class="header-left">
-        <h1 class="exam-title">{{ examInfo.title }}</h1>
+        <h1 class="exam-title">{{ examInfo.basicInfo.title }}</h1>
         <div class="exam-meta">
-          <span>总分：{{ examInfo.totalScore }}分</span>
-          <span>及格分：{{ examInfo.passScore }}分</span>
-          <span>题目数：{{ examInfo.questionCount }}题</span>
+          <span>总分：{{ examInfo.settings.totalScore }}分</span>
+          <span>及格分：{{ examInfo.settings.passingScore }}分</span>
+          <span>题目数：{{ questionCount }}题</span>
         </div>
       </div>
       <div class="header-right">
@@ -24,7 +24,7 @@
       <div class="answer-area" ref="answerAreaRef">
         <!-- 遍历所有题目 -->
         <div
-          v-for="(question, index) in examInfo.questions"
+          v-for="(question, index) in allQuestions"
           :key="question.id || index"
           :id="`question-${index}`"
           class="question-block"
@@ -107,14 +107,14 @@
         <div class="nav-header">
           <h3>答题卡</h3>
           <div class="progress-info">
-            <span>已答：{{ answeredCount }}/{{ examInfo.questionCount }}</span>
+            <span>已答：{{ answeredCount }}/{{ questionCount }}</span>
           </div>
         </div>
 
         <div class="nav-content">
           <div class="question-grid">
             <div
-              v-for="(question, index) in examInfo.questions"
+              v-for="(question, index) in allQuestions"
               :key="question.id || index"
               class="question-item"
               :class="{
@@ -169,15 +169,48 @@ console.log('考试详情页加载', {
 // 引用
 const answerAreaRef = ref(null)
 
-// 考试信息
+// 考试信息 - 完全采用JSON格式规范
 const examInfo = ref({
-  id: examId.value,
-  title: '软件工程期中考试',
-  totalScore: 100,
-  passScore: 60,
-  duration: 90, // 分钟
-  questionCount: 0,
-  questions: []
+  id: `exam_${examId.value.toString().padStart(3, '0')}`,
+  type: 'exam',
+  metadata: {
+    version: '1.0',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-15T10:30:00Z',
+    createdBy: 'teacher_001',
+    courseId: courseId.value
+  },
+  basicInfo: {
+    title: '',
+    description: '',
+    type: 'midterm',
+    difficulty: 'medium'
+  },
+  schedule: {
+    startTime: '2024-11-15T10:00:00Z',
+    endTime: '2024-11-15T11:30:00Z',
+    duration: 90,
+    reviewStartTime: '2024-11-20T00:00:00Z'
+  },
+  settings: {
+    totalScore: 100,
+    passingScore: 60,
+    showScoreAfterSubmit: true,
+    randomOrder: true,
+    randomQuestions: true,
+    questionsPerBank: 50,
+    allowReview: true,
+    reviewDelay: 86400,
+    proctorRequired: false,
+    cameraRequired: false
+  },
+  questionBanks: [],
+  grading: {
+    autoGrade: true,
+    manualReviewRequired: true,
+    essayReviewers: ['teacher_001', 'teacher_002'],
+    gradingDeadline: '2024-11-25T23:59:59Z'
+  }
 })
 
 // 剩余时间（秒）
@@ -188,9 +221,23 @@ const activeQuestion = ref(0)
 let timer = null
 let scrollTimeout = null
 
+// 计算所有题目（从题库中展平）
+const allQuestions = computed(() => {
+  const questions = []
+  examInfo.value.questionBanks.forEach(bank => {
+    questions.push(...bank.questions)
+  })
+  return questions
+})
+
 // 计算已答题数
 const answeredCount = computed(() => {
-  return examInfo.value.questions.filter(q => isAnswered(q)).length
+  return allQuestions.value.filter(q => isAnswered(q)).length
+})
+
+// 计算题目总数
+const questionCount = computed(() => {
+  return allQuestions.value.length
 })
 
 // 判断题目是否已答
@@ -242,7 +289,7 @@ const scrollToQuestion = (index) => {
 
 // 提交考卷处理
 const handleSubmit = () => {
-  const unansweredCount = examInfo.value.questionCount - answeredCount.value
+  const unansweredCount = questionCount.value - answeredCount.value
 
   if (unansweredCount > 0) {
     ElMessageBox.confirm(
@@ -283,6 +330,32 @@ const submitExam = () => {
     timer = null
   }
 
+  // 计算得分
+  let totalScore = 0
+  allQuestions.value.forEach(question => {
+    if (question.type === 'single') {
+      if (question.answer === question.correctAnswer) {
+        totalScore += question.score
+      }
+    } else if (question.type === 'multiple') {
+      const userAnswers = [...question.answer].sort()
+      const correctAnswers = [...question.correctAnswers].sort()
+      if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
+        totalScore += question.score
+      }
+    } else if (question.type === 'fill') {
+      // 填空题简单判断
+      if (question.answer && question.correctAnswers.some(ans =>
+        question.answer.toLowerCase().includes(ans.toLowerCase())
+      )) {
+        totalScore += question.score
+      }
+    } else if (question.type === 'essay') {
+      // 问答题需要人工评分，这里给满分
+      totalScore += question.score
+    }
+  })
+
   // 保存到localStorage
   try {
     const completed = localStorage.getItem('completedExams')
@@ -295,21 +368,28 @@ const submitExam = () => {
     // 保存答题数据
     const examData = {
       examId: examId.value,
-      answers: examInfo.value.questions.map(q => ({
-        question: q.question,
+      examTitle: examInfo.value.basicInfo.title,
+      totalScore: examInfo.value.settings.totalScore,
+      userScore: totalScore,
+      passingScore: examInfo.value.settings.passingScore,
+      answers: allQuestions.value.map(q => ({
+        questionId: q.id,
+        questionText: q.questionText,
         type: q.type,
-        answer: q.answer,
-        score: q.score
+        userAnswer: q.answer,
+        score: q.score,
+        correctAnswer: q.correctAnswer || q.correctAnswers || q.referenceAnswer
       })),
       submittedAt: new Date().toISOString(),
-      timeSpent: examInfo.value.duration * 60 - remainingTime.value
+      timeSpent: examInfo.value.schedule.duration * 60 - remainingTime.value,
+      metadata: examInfo.value.metadata
     }
     localStorage.setItem(`exam_${examId.value}_data`, JSON.stringify(examData))
   } catch (error) {
     console.error('保存考试数据失败:', error)
   }
 
-  ElMessage.success('考卷提交成功！')
+  ElMessage.success(`考卷提交成功！得分：${totalScore}分`)
 
   // 返回考试列表页
   setTimeout(() => {
@@ -340,191 +420,269 @@ const startTimer = () => {
   }, 1000)
 }
 
-// 加载考试数据
+// 加载考试数据 - 完全采用JSON格式规范
 const loadExamData = () => {
-  // 模拟考试数据
-  const questions = [
-    // 单选题
-    {
-      id: 1,
-      type: 'single',
-      question: '软件工程的核心目标是什么？',
-      score: 2,
-      options: [
-        { value: 'A', text: '提高开发速度' },
-        { value: 'B', text: '降低开发成本' },
-        { value: 'C', text: '提高软件质量和可维护性' },
-        { value: 'D', text: '增加代码量' }
-      ],
-      answer: ''
-    },
-    {
-      id: 2,
-      type: 'single',
-      question: '瀑布模型的主要特点是什么？',
-      score: 2,
-      options: [
-        { value: 'A', text: '迭代开发' },
-        { value: 'B', text: '线性顺序开发' },
-        { value: 'C', text: '敏捷开发' },
-        { value: 'D', text: '原型开发' }
-      ],
-      answer: ''
-    },
-    {
-      id: 3,
-      type: 'single',
-      question: '以下哪个不是软件生命周期模型？',
-      score: 2,
-      options: [
-        { value: 'A', text: '瀑布模型' },
-        { value: 'B', text: '螺旋模型' },
-        { value: 'C', text: '增量模型' },
-        { value: 'D', text: '递归模型' }
-      ],
-      answer: ''
-    },
-    {
-      id: 4,
-      type: 'single',
-      question: 'UML中用例图的主要作用是什么？',
-      score: 2,
-      options: [
-        { value: 'A', text: '描述系统的功能需求' },
-        { value: 'B', text: '描述系统的架构设计' },
-        { value: 'C', text: '描述系统的数据库设计' },
-        { value: 'D', text: '描述系统的部署方案' }
-      ],
-      answer: ''
-    },
-    {
-      id: 5,
-      type: 'single',
-      question: '黑盒测试主要关注的是什么？',
-      score: 2,
-      options: [
-        { value: 'A', text: '代码的逻辑结构' },
-        { value: 'B', text: '输入和输出的关系' },
-        { value: 'C', text: '代码的执行效率' },
-        { value: 'D', text: '代码的可读性' }
-      ],
-      answer: ''
-    },
-    // 多选题
-    {
-      id: 6,
-      type: 'multiple',
-      question: '软件生命周期包括哪些阶段？（多选）',
-      score: 3,
-      options: [
-        { value: 'A', text: '需求分析' },
-        { value: 'B', text: '系统设计' },
-        { value: 'C', text: '编码实现' },
-        { value: 'D', text: '测试维护' }
-      ],
-      answer: []
-    },
-    {
-      id: 7,
-      type: 'multiple',
-      question: '敏捷开发的核心价值观包括？（多选）',
-      score: 3,
-      options: [
-        { value: 'A', text: '个体和互动高于流程和工具' },
-        { value: 'B', text: '工作的软件高于详尽的文档' },
-        { value: 'C', text: '客户合作高于合同谈判' },
-        { value: 'D', text: '响应变化高于遵循计划' }
-      ],
-      answer: []
-    },
-    {
-      id: 8,
-      type: 'multiple',
-      question: '软件测试的类型包括哪些？（多选）',
-      score: 3,
-      options: [
-        { value: 'A', text: '单元测试' },
-        { value: 'B', text: '集成测试' },
-        { value: 'C', text: '系统测试' },
-        { value: 'D', text: '验收测试' }
-      ],
-      answer: []
-    },
-    {
-      id: 9,
-      type: 'multiple',
-      question: '以下哪些是面向对象的基本特征？（多选）',
-      score: 3,
-      options: [
-        { value: 'A', text: '封装' },
-        { value: 'B', text: '继承' },
-        { value: 'C', text: '多态' },
-        { value: 'D', text: '抽象' }
-      ],
-      answer: []
-    },
-    // 填空题
-    {
-      id: 10,
-      type: 'fill',
-      question: '软件工程三要素是方法、工具和_______。',
-      score: 5,
-      answer: ''
-    },
-    {
-      id: 11,
-      type: 'fill',
-      question: 'UML是_______的缩写。',
-      score: 5,
-      answer: ''
-    },
-    {
-      id: 12,
-      type: 'fill',
-      question: '软件测试的目的是发现软件中的_______。',
-      score: 5,
-      answer: ''
-    },
-    {
-      id: 13,
-      type: 'fill',
-      question: 'MVC架构模式中的V代表_______。',
-      score: 5,
-      answer: ''
-    },
-    // 问答题
-    {
-      id: 14,
-      type: 'essay',
-      question: '请简述软件测试的目的和重要性。',
-      score: 10,
-      answer: ''
-    },
-    {
-      id: 15,
-      type: 'essay',
-      question: '请描述你对敏捷开发的理解，并举例说明其优缺点。',
-      score: 15,
-      answer: ''
-    },
-    {
-      id: 16,
-      type: 'essay',
-      question: '请解释什么是软件重构，以及为什么需要进行软件重构。',
-      score: 15,
-      answer: ''
-    },
-    {
-      id: 17,
-      type: 'essay',
-      question: '请论述软件项目管理中风险管理的重要性，并举例说明常见的风险类型。',
-      score: 20,
-      answer: ''
-    }
-  ]
+  console.log('加载考试数据 - examId:', examId.value, 'courseId:', courseId.value)
 
-  examInfo.value.questions = questions
-  examInfo.value.questionCount = questions.length
+  // 根据examId生成不同的考试模板
+  const examTemplates = {
+    1: {
+      basicInfo: {
+        title: '软件工程期中考试',
+        description: '软件工程课程期中考试，涵盖软件工程基础、需求分析、设计模式等内容',
+        type: 'midterm',
+        difficulty: 'medium'
+      },
+      questionBanks: [
+        {
+          id: 'bank_001',
+          name: '单选题库',
+          type: 'single',
+          questionCount: 5,
+          scorePerQuestion: 2,
+          totalQuestionsNeeded: 5,
+          questions: [
+            {
+              id: 'question_001',
+              questionText: '软件工程的核心目标是什么？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '提高开发速度' },
+                { id: 'opt_b', value: 'B', text: '降低开发成本' },
+                { id: 'opt_c', value: 'C', text: '提高软件质量和可维护性' },
+                { id: 'opt_d', value: 'D', text: '增加代码量' }
+              ],
+              correctAnswer: 'C',
+              explanation: '软件工程的核心目标是通过系统的方法提高软件质量和可维护性',
+              knowledgePoints: ['软件工程基础'],
+              difficulty: 'easy',
+              score: 2,
+              answer: ''
+            },
+            {
+              id: 'question_002',
+              questionText: '瀑布模型的主要特点是什么？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '迭代开发' },
+                { id: 'opt_b', value: 'B', text: '线性顺序开发' },
+                { id: 'opt_c', value: 'C', text: '敏捷开发' },
+                { id: 'opt_d', value: 'D', text: '原型开发' }
+              ],
+              correctAnswer: 'B',
+              explanation: '瀑布模型采用线性顺序的开发方式，每个阶段都必须完成后才能进入下一个阶段',
+              knowledgePoints: ['软件生命周期'],
+              difficulty: 'easy',
+              score: 2,
+              answer: ''
+            },
+            {
+              id: 'question_003',
+              questionText: '以下哪个不是软件生命周期模型？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '瀑布模型' },
+                { id: 'opt_b', value: 'B', text: '螺旋模型' },
+                { id: 'opt_c', value: 'C', text: '增量模型' },
+                { id: 'opt_d', value: 'D', text: '递归模型' }
+              ],
+              correctAnswer: 'D',
+              explanation: '递归模型不是软件生命周期模型，它是一种编程技术',
+              knowledgePoints: ['软件生命周期'],
+              difficulty: 'easy',
+              score: 2,
+              answer: ''
+            },
+            {
+              id: 'question_004',
+              questionText: 'UML中用例图的主要作用是什么？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '描述系统的功能需求' },
+                { id: 'opt_b', value: 'B', text: '描述系统的架构设计' },
+                { id: 'opt_c', value: 'C', text: '描述系统的数据库设计' },
+                { id: 'opt_d', value: 'D', text: '描述系统的部署方案' }
+              ],
+              correctAnswer: 'A',
+              explanation: '用例图主要用于描述系统的功能需求和用户交互',
+              knowledgePoints: ['UML建模'],
+              difficulty: 'medium',
+              score: 2,
+              answer: ''
+            },
+            {
+              id: 'question_005',
+              questionText: '黑盒测试主要关注的是什么？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '代码的逻辑结构' },
+                { id: 'opt_b', value: 'B', text: '输入和输出的关系' },
+                { id: 'opt_c', value: 'C', text: '代码的执行效率' },
+                { id: 'opt_d', value: 'D', text: '代码的可读性' }
+              ],
+              correctAnswer: 'B',
+              explanation: '黑盒测试关注软件的外部行为，即输入输出的关系',
+              knowledgePoints: ['软件测试'],
+              difficulty: 'easy',
+              score: 2,
+              answer: ''
+            }
+          ]
+        },
+        {
+          id: 'bank_002',
+          name: '多选题库',
+          type: 'multiple',
+          questionCount: 2,
+          scorePerQuestion: 3,
+          totalQuestionsNeeded: 2,
+          questions: [
+            {
+              id: 'question_006',
+              questionText: '软件生命周期包括哪些阶段？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '需求分析' },
+                { id: 'opt_b', value: 'B', text: '系统设计' },
+                { id: 'opt_c', value: 'C', text: '编码实现' },
+                { id: 'opt_d', value: 'D', text: '测试维护' }
+              ],
+              correctAnswers: ['A', 'B', 'C', 'D'],
+              explanation: '软件生命周期包括需求分析、系统设计、编码实现和测试维护等所有阶段',
+              knowledgePoints: ['软件生命周期'],
+              difficulty: 'medium',
+              score: 3,
+              answer: []
+            },
+            {
+              id: 'question_007',
+              questionText: '敏捷开发的核心价值观包括？',
+              options: [
+                { id: 'opt_a', value: 'A', text: '个体和互动高于流程和工具' },
+                { id: 'opt_b', value: 'B', text: '工作的软件高于详尽的文档' },
+                { id: 'opt_c', value: 'C', text: '客户合作高于合同谈判' },
+                { id: 'opt_d', value: 'D', text: '响应变化高于遵循计划' }
+              ],
+              correctAnswers: ['A', 'B', 'C', 'D'],
+              explanation: '敏捷开发宣言包含四个核心价值观，都体现了敏捷开发的核心理念',
+              knowledgePoints: ['敏捷开发'],
+              difficulty: 'medium',
+              score: 3,
+              answer: []
+            }
+          ]
+        },
+        {
+          id: 'bank_003',
+          name: '填空题库',
+          type: 'fill',
+          questionCount: 2,
+          scorePerQuestion: 5,
+          totalQuestionsNeeded: 2,
+          questions: [
+            {
+              id: 'question_008',
+              questionText: '软件工程三要素是方法、工具和_______。',
+              correctAnswers: ['过程'],
+              explanation: '软件工程三要素是方法、工具和过程',
+              knowledgePoints: ['软件工程基础'],
+              difficulty: 'easy',
+              score: 5,
+              answer: ''
+            },
+            {
+              id: 'question_009',
+              questionText: 'UML是_______的缩写。',
+              correctAnswers: ['Unified Modeling Language', '统一建模语言'],
+              explanation: 'UML是Unified Modeling Language（统一建模语言）的缩写',
+              knowledgePoints: ['UML建模'],
+              difficulty: 'easy',
+              score: 5,
+              answer: ''
+            }
+          ]
+        },
+        {
+          id: 'bank_004',
+          name: '问答题库',
+          type: 'essay',
+          questionCount: 2,
+          scorePerQuestion: 15,
+          totalQuestionsNeeded: 2,
+          questions: [
+            {
+              id: 'question_010',
+              questionText: '请简述软件测试的目的和重要性。',
+              referenceAnswer: '软件测试的目的是发现软件中的缺陷和错误，确保软件质量。重要性包括：1) 提高软件质量；2) 降低维护成本；3) 增强用户信心；4) 符合标准和法规要求。',
+              knowledgePoints: ['软件测试'],
+              difficulty: 'medium',
+              score: 15,
+              answer: ''
+            },
+            {
+              id: 'question_011',
+              questionText: '请解释什么是软件重构，以及为什么需要进行软件重构。',
+              referenceAnswer: '软件重构是在不改变软件外部行为的前提下，对软件内部结构进行改进的过程。需要进行重构的原因：1) 改善代码可读性；2) 提高可维护性；3) 消除技术债务；4) 适应需求变化；5) 提高开发效率。',
+              knowledgePoints: ['软件重构'],
+              difficulty: 'hard',
+              score: 15,
+              answer: ''
+            }
+          ]
+        }
+      ]
+    },
+    2: {
+      basicInfo: {
+        title: '软件工程期末考试',
+        description: '软件工程课程期末综合考试',
+        type: 'final',
+        difficulty: 'hard'
+      },
+      questionBanks: [
+        // 可以添加更多期末考试题库
+      ]
+    }
+  }
+
+  // 获取当前考试的模板数据
+  const template = examTemplates[examId.value] || examTemplates[1]
+
+  // 构建完整的JSON格式考试数据
+  const mockData = {
+    id: `exam_${examId.value.toString().padStart(3, '0')}`,
+    type: 'exam',
+    metadata: {
+      version: '1.0',
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-15T10:30:00Z',
+      createdBy: 'teacher_001',
+      courseId: courseId.value
+    },
+    basicInfo: template.basicInfo,
+    schedule: {
+      startTime: '2024-11-15T10:00:00Z',
+      endTime: '2024-11-15T11:30:00Z',
+      duration: 90,
+      reviewStartTime: '2024-11-20T00:00:00Z'
+    },
+    settings: {
+      totalScore: 100,
+      passingScore: 60,
+      showScoreAfterSubmit: true,
+      randomOrder: true,
+      randomQuestions: true,
+      questionsPerBank: 50,
+      allowReview: true,
+      reviewDelay: 86400,
+      proctorRequired: false,
+      cameraRequired: false
+    },
+    questionBanks: template.questionBanks,
+    grading: {
+      autoGrade: true,
+      manualReviewRequired: true,
+      essayReviewers: ['teacher_001', 'teacher_002'],
+      gradingDeadline: '2024-11-25T23:59:59Z'
+    }
+  }
+
+  examInfo.value = mockData
+  console.log('考试数据加载完成:', examInfo.value)
 }
 
 // 监听滚动，更新当前题目（使用节流优化性能）
