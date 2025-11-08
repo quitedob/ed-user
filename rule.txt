@@ -58,6 +58,27 @@
                 "type": "pdf",
                 "title": "课件讲义",
                 "url": "https://cdn.example.com/materials/material_001.pdf"
+              },
+              {
+                "id": "material_002",
+                "type": "image",
+                "title": "课程相关图片",
+                "images": [
+                  {
+                    "id": "img_001",
+                    "url": "https://cdn.example.com/images/img_001.jpg",
+                    "title": "软件工程概述图",
+                    "description": "这张图片展示了软件工程的基本概念和主要组成部分",
+                    "alt": "软件工程概述图"
+                  },
+                  {
+                    "id": "img_002",
+                    "url": "https://cdn.example.com/images/img_002.png",
+                    "title": "软件生命周期图",
+                    "description": "这张图片展示了软件开发的完整生命周期",
+                    "alt": "软件生命周期图"
+                  }
+                ]
               }
             ],
             "attachments": []
@@ -363,14 +384,47 @@
 }
 ```
 
-## 5. 项目实现现状
+## 5. 图片模块规范
 
-### 5.1 已实现页面
+### 5.1 图片材料结构
+```json
+{
+  "id": "material_002",
+  "type": "image",
+  "title": "课程相关图片",
+  "images": [
+    {
+      "id": "img_001",
+      "url": "https://cdn.example.com/images/img_001.jpg",
+      "title": "软件工程概述图",
+      "description": "这张图片展示了软件工程的基本概念和主要组成部分",
+      "alt": "软件工程概述图"
+    }
+  ]
+}
+```
+
+### 5.2 图片字段说明
+- **id**: 图片唯一标识符，格式为`img_{number}`
+- **url**: 图片资源地址，支持本地路径和网络URL
+- **title**: 图片标题，用于显示和搜索
+- **description**: 图片详细描述，用于图片预览时的说明
+- **alt**: 图片的alt属性，用于无障碍访问和图片加载失败时的提示
+
+### 5.3 图片展示功能
+- 支持多张图片的网格布局展示
+- 点击图片可查看大图和详细信息
+- 支持图片预览对话框，包含标题和描述
+- 响应式设计，适配不同屏幕尺寸
+
+## 6. 项目实现现状
+
+### 6.1 已实现页面
 - ✅ `pages/student/course/[id]/section/[sectionId].vue` - 章节学习页
 - ✅ `pages/student/course/[id]/homework/[homeworkId].vue` - 作业详情页
 - ✅ `pages/student/course/[id]/exam/[exam].vue` - 考试详情页
 
-### 5.2 JSON格式使用情况
+### 6.2 JSON格式使用情况
 - ✅ **metadata字段**: 所有页面都包含version、createdAt、updatedBy等元数据
 - ✅ **basicInfo字段**: 所有页面都包含title、description、type、difficulty等基础信息
 - ✅ **schedule字段**: 所有页面都包含时间安排信息
@@ -378,7 +432,7 @@
 - ✅ **题目格式**: 统一使用questionText、options、correctAnswer等字段
 - ✅ **题库结构**: 考试页面采用questionBanks结构
 
-### 5.3 路由路径使用规范
+### 6.3 路由路径使用规范
 **主要路径**: `/student/course/[id]/` - 学生门户路径
 - 章节学习: `/student/course/[id]/section/[sectionId]`
 - 作业列表: `/student/course/[id]/homework`
@@ -386,33 +440,33 @@
 - 考试列表: `/student/course/[id]/exam`
 - 考试详情: `/student/course/[id]/exam/[exam]`
 
-## 6. 开发规范
+## 7. 开发规范
 
-### 6.1 命名规范
+### 7.1 命名规范
 - ID格式: `{type}_{number}` (如: course_001, homework_001, exam_001)
 - 选项ID: opt_{letter} (如: opt_a, opt_b)
 - 题目ID: question_{number} (如: question_001)
 
-### 6.2 时间格式
+### 7.2 时间格式
 - 使用ISO 8601格式: `2024-01-01T00:00:00Z`
 - 所有时间字段统一使用UTC时间
 
-### 6.3 分页和排序
+### 7.3 分页和排序
 - order字段用于排序
 - 分页由前端处理，JSON提供完整数据
 
-## 7. 兼容性说明
+## 8. 兼容性说明
 
-### 7.1 向后兼容
+### 8.1 向后兼容
 - 支持渐进式迁移到新格式
 - 旧格式数据可在前端进行转换
 
-### 7.2 前端适配
+### 8.2 前端适配
 - 本地资源支持: 支持使用`/sample.mp4`等本地资源
 - 缓存机制: 支持localStorage缓存用户答题数据
 - 错误处理: 完善的错误处理和降级方案
 
-## 8. 更新日志
+## 9. 更新日志
 
 ### v1.0 (2024-01-15)
 - 初始版本发布

@@ -54,6 +54,36 @@
           <div v-html="block.content"></div>
         </div>
 
+        <!-- 图片展示 -->
+        <div v-else-if="block.type === 'image'" class="image-container">
+          <h3 class="block-title">{{ block.title }}</h3>
+          <div class="image-gallery">
+            <div 
+              v-for="(image, imgIndex) in block.images" 
+              :key="imgIndex" 
+              class="image-item"
+              @click="previewImage(image)"
+            >
+              <img :src="image.url" :alt="image.alt || image.title" />
+              <div class="image-caption">{{ image.title }}</div>
+            </div>
+          </div>
+          <!-- 图片预览对话框 -->
+          <el-dialog
+            v-model="imagePreviewVisible"
+            title="图片预览"
+            width="80%"
+            center
+            append-to-body
+          >
+            <div class="image-preview">
+              <img :src="previewImageData.url" :alt="previewImageData.alt || previewImageData.title" />
+              <div class="preview-caption">{{ previewImageData.title }}</div>
+              <div v-if="previewImageData.description" class="preview-description">{{ previewImageData.description }}</div>
+            </div>
+          </el-dialog>
+        </div>
+
         <!-- 题目展示 -->
         <div v-else-if="block.type === 'quiz'" class="quiz-container">
           <div class="quiz-header">
@@ -274,6 +304,26 @@ const hasNextSection = ref(false)
 // 右侧标签页
 const activeTab = ref('outline')
 
+// 图片预览相关
+const imagePreviewVisible = ref(false)
+const previewImageData = ref({
+  url: '',
+  title: '',
+  description: '',
+  alt: ''
+})
+
+// 图片预览方法
+const previewImage = (image) => {
+  previewImageData.value = {
+    url: image.url,
+    title: image.title,
+    description: image.description || '',
+    alt: image.alt || image.title
+  }
+  imagePreviewVisible.value = true
+}
+
 // 方法
 const goToSection = (targetSectionId) => {
   if (targetSectionId !== sectionId.value) {
@@ -379,6 +429,25 @@ const loadChaptersData = () => {
                 type: 'pdf',
                 title: '课件讲义',
                 url: '/sample.pdf'
+              },
+              {
+                id: 'material_002',
+                type: 'image',
+                title: '课程相关图片',
+                images: [
+                  {
+                    url: '/images/common_head.jpg',
+                    title: '软件工程概述图',
+                    description: '这张图片展示了软件工程的基本概念和主要组成部分',
+                    alt: '软件工程概述图'
+                  },
+                  {
+                    url: '/images/logo.png',
+                    title: '软件生命周期图',
+                    description: '这张图片展示了软件开发的完整生命周期',
+                    alt: '软件生命周期图'
+                  }
+                ]
               }
             ],
             attachments: []
@@ -638,6 +707,25 @@ const generateContentBlocks = (section) => {
             </ul>
           `
         })
+      } else if (material.type === 'image') {
+        blocks.push({
+          type: 'image',
+          title: material.title,
+          images: material.images || [
+            {
+              url: '/images/common_head.jpg',
+              title: '示例图片1',
+              description: '这是一个示例图片，用于展示图片功能',
+              alt: '示例图片1'
+            },
+            {
+              url: '/images/logo.png',
+              title: '示例图片2',
+              description: '这是另一个示例图片',
+              alt: '示例图片2'
+            }
+          ]
+        })
       }
     })
   }
@@ -889,6 +977,70 @@ watch(() => route.params.sectionId, () => {
 
   :deep(li) {
     margin: 8px 0;
+  }
+}
+
+.image-container {
+  .image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+
+    .image-item {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .image-caption {
+        padding: 12px;
+        background: #f8f9fa;
+        font-size: 14px;
+        color: #303133;
+        text-align: center;
+        border-top: 1px solid #e4e7ed;
+      }
+    }
+  }
+
+  .image-preview {
+    text-align: center;
+
+    img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .preview-caption {
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #303133;
+    }
+
+    .preview-description {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #606266;
+      line-height: 1.6;
+    }
   }
 }
 
