@@ -45,23 +45,47 @@
               class="section-item"
               :class="{
                 completed: section.completed,
-                current: section.isCurrent
+                current: section.isCurrent,
+                'is-homework': section.contentType === 'homework'
               }"
               @click="goToSection(chapter.id, section.id)"
             >
-              <el-icon v-if="section.completed" color="#67c23a" class="section-status">
-                <Check />
-              </el-icon>
-              <el-icon v-else-if="section.isCurrent" color="#409eff" class="section-status">
-                <CaretRight />
-              </el-icon>
-              <el-icon v-else color="#c0c4cc" class="section-status">
-                <VideoPlay />
-              </el-icon>
+              <!-- 状态图标 -->
+              <div class="section-status-wrapper">
+                <el-icon v-if="section.completed" color="#67c23a" class="section-status">
+                  <Check />
+                </el-icon>
+                <el-icon v-else-if="section.isCurrent" color="#409eff" class="section-status">
+                  <CaretRight />
+                </el-icon>
+                <el-icon v-else-if="section.contentType === 'homework'" color="#e6a23c" class="section-status">
+                  <EditPen />
+                </el-icon>
+                <el-icon v-else color="#c0c4cc" class="section-status">
+                  <VideoPlay />
+                </el-icon>
+              </div>
+
+              <!-- 章节信息 -->
               <div class="section-info">
                 <span class="section-number">{{ section.number }}</span>
                 <span class="section-title">{{ section.title }}</span>
                 <span class="section-duration">{{ section.duration }}</span>
+
+                <!-- 作业状态标签 -->
+                <div v-if="section.contentType === 'homework'" class="homework-status">
+                  <el-tag v-if="section.homeworkCompleted" type="success" size="small">
+                    已完成
+                  </el-tag>
+                  <el-tag v-else type="warning" size="small">
+                    待完成
+                  </el-tag>
+                </div>
+              </div>
+
+              <!-- 作业得分显示 -->
+              <div v-if="section.contentType === 'homework' && section.homeworkScore > 0" class="homework-score">
+                <span class="score-text">{{ section.homeworkScore }}/{{ section.homeworkMaxScore }}分</span>
               </div>
             </div>
           </div>
@@ -79,7 +103,8 @@ import {
   School,
   User,
   Clock,
-  Calendar
+  Calendar,
+  EditPen
 } from '@element-plus/icons-vue'
 
 definePageMeta({
@@ -225,7 +250,7 @@ const loadCourseData = async () => {
 
 // 加载章节数据
 const loadChaptersData = () => {
-  // 模拟章节数据
+  // 模拟章节数据，添加练习配置
   const chaptersData = [
     {
       id: 1,
@@ -237,8 +262,28 @@ const loadChaptersData = () => {
       totalSections: 2,
       locked: false,
       sections: [
-        { id: 1, number: '1.1', title: '软件工程的基本概念', duration: '45分钟', completed: true, isCurrent: false },
-        { id: 2, number: '1.2', title: '软件生命周期模型', duration: '60分钟', completed: true, isCurrent: false }
+        {
+          id: 1,
+          number: '1.1',
+          title: '软件工程的基本概念',
+          duration: '45分钟',
+          completed: true,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 2,
+          number: '1.2',
+          title: '第一章作业',
+          duration: '作业',
+          completed: false,
+          isCurrent: false,
+          contentType: 'homework',
+          hasHomework: true,
+          homeworkCompleted: false,
+          homeworkScore: 0,
+          homeworkMaxScore: 30
+        }
       ]
     },
     {
@@ -251,10 +296,46 @@ const loadChaptersData = () => {
       totalSections: 4,
       locked: false,
       sections: [
-        { id: 3, number: '2.1', title: '需求获取', duration: '50分钟', completed: true, isCurrent: false },
-        { id: 4, number: '2.2', title: '需求分析', duration: '55分钟', completed: true, isCurrent: false },
-        { id: 5, number: '2.3', title: '需求规格说明', duration: '65分钟', completed: true, isCurrent: true },
-        { id: 6, number: '2.4', title: '需求验证', duration: '40分钟', completed: false, isCurrent: false }
+        {
+          id: 3,
+          number: '2.1',
+          title: '需求获取',
+          duration: '50分钟',
+          completed: true,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 4,
+          number: '2.2',
+          title: '需求分析',
+          duration: '55分钟',
+          completed: true,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 5,
+          number: '2.3',
+          title: '需求规格说明',
+          duration: '65分钟',
+          completed: true,
+          isCurrent: true,
+          contentType: 'video'
+        },
+        {
+          id: 6,
+          number: '2.4',
+          title: '第二章作业',
+          duration: '作业',
+          completed: false,
+          isCurrent: false,
+          contentType: 'homework',
+          hasHomework: true,
+          homeworkCompleted: false,
+          homeworkScore: 0,
+          homeworkMaxScore: 40
+        }
       ]
     },
     {
@@ -267,10 +348,46 @@ const loadChaptersData = () => {
       totalSections: 4,
       locked: false,
       sections: [
-        { id: 7, number: '3.1', title: '总体设计', duration: '70分钟', completed: true, isCurrent: false },
-        { id: 8, number: '3.2', title: '详细设计', duration: '65分钟', completed: false, isCurrent: false },
-        { id: 9, number: '3.3', title: '数据库设计', duration: '80分钟', completed: false, isCurrent: false },
-        { id: 10, number: '3.4', title: '界面设计', duration: '45分钟', completed: false, isCurrent: false }
+        {
+          id: 7,
+          number: '3.1',
+          title: '总体设计',
+          duration: '70分钟',
+          completed: true,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 8,
+          number: '3.2',
+          title: '详细设计',
+          duration: '65分钟',
+          completed: false,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 9,
+          number: '3.3',
+          title: '数据库设计',
+          duration: '80分钟',
+          completed: false,
+          isCurrent: false,
+          contentType: 'video'
+        },
+        {
+          id: 10,
+          number: '3.4',
+          title: '第三章作业',
+          duration: '作业',
+          completed: false,
+          isCurrent: false,
+          contentType: 'homework',
+          hasHomework: true,
+          homeworkCompleted: false,
+          homeworkScore: 0,
+          homeworkMaxScore: 50
+        }
       ]
     }
   ]
@@ -388,8 +505,29 @@ onMounted(() => {
             padding-left: 45px;
           }
 
-          .section-status {
+          &.is-homework {
+            position: relative;
+
+            .section-title {
+              font-weight: 500;
+              color: #e6a23c;
+            }
+
+            &:hover {
+              border-color: #e6a23c;
+            }
+          }
+
+          .section-status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             flex-shrink: 0;
+            position: relative;
+
+            .section-status {
+              font-size: 16px;
+            }
           }
 
           .section-info {
@@ -397,6 +535,7 @@ onMounted(() => {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
 
             .section-number {
               font-size: 12px;
@@ -408,11 +547,38 @@ onMounted(() => {
               flex: 1;
               font-size: 14px;
               color: #303133;
+              min-width: 0;
             }
 
             .section-duration {
               font-size: 12px;
               color: #909399;
+            }
+
+            .homework-status {
+              margin-left: 8px;
+
+              .el-tag {
+                font-size: 11px;
+                padding: 0 6px;
+                height: 20px;
+                line-height: 20px;
+              }
+            }
+          }
+
+          .homework-score {
+            flex-shrink: 0;
+            margin-left: 8px;
+
+            .score-text {
+              font-size: 12px;
+              color: #e6a23c;
+              font-weight: 600;
+              background: #fdf6ec;
+              padding: 2px 6px;
+              border-radius: 4px;
+              border: 1px solid #f5dab1;
             }
           }
         }
