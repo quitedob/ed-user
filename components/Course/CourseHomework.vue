@@ -3,8 +3,8 @@
     <!-- 作业列表视图 -->
     <div class="homework-list-view">
       <el-tabs v-model="activeTab" class="homework-tabs">
-        <!-- 传统作业标签页 -->
-        <el-tab-pane label="传统作业" name="traditional">
+        <!-- 作业标签页 -->
+        <el-tab-pane label="作业" name="traditional">
           <el-tabs v-model="traditionalTab" class="sub-tabs">
             <el-tab-pane label="未完成" name="pending">
               <div class="homework-list">

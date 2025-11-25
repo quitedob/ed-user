@@ -273,7 +273,7 @@ const handleExerciseSubmit = async (answers) => {
 ```vue
 <template>
   <div class="homework-list">
-    <!-- 标签页：传统作业 vs 章节练习 -->
+    <!-- 标签页：作业 vs 章节练习 -->
     <el-tabs v-model="activeTab">
       <el-tab-pane label="章节练习" name="chapter_exercise">
         <homework-card 
@@ -284,7 +284,7 @@ const handleExerciseSubmit = async (answers) => {
         />
       </el-tab-pane>
 
-      <el-tab-pane label="传统作业" name="traditional">
+      <el-tab-pane label="作业" name="traditional">
         <homework-card 
           v-for="homework in traditionalHomeworks"
           :key="homework.id"
@@ -459,7 +459,7 @@ interface ChapterExercise {
 │  ├─ [第2章] 软件过程 (2/5) 进行中 ⏳
 │  └─ [第3章] 需求分析 (0/5) 未开始
 │
-└─ 📝 传统作业
+└─ 📝 作业
    ├─ [作业1] 第一周课后作业 (85/100) 已完成 ✓
    └─ [作业2] 中期综合练习 (待提交) ⏳
 ```
