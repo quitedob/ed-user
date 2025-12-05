@@ -1,0 +1,424 @@
+Icon​
+Element Plus provides a set of common icons.
+
+Icon Usage​
+If you want to use directly like the example, you need to globally register the components before using it.
+
+If you want to see all available SVG icons please check @element-plus/icons-vue@1.x@element-plus/icons-vue@latest and the source element-plus-icons out or Icon Collection
+
+Installation​
+Using packaging manager​
+Choose a package manager you like.
+
+
+npm
+
+yarn
+
+pnpm
+shell
+$ npm install @element-plus/icons-vue
+Register All Icons​
+You need import all icons from @element-plus/icons-vue and register them globally.
+
+ts
+// main.ts
+
+// if you're using CDN, please remove this line.
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+const app = createApp(App)
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+You can also refer to this template.
+
+Import in Browser​
+Import Element Plus Icons through browser HTML tags directly, and use global variable ElementPlusIconsVue.
+
+According to different CDN providers, there are different introduction methods. Here we use unpkg and jsDelivr as example. You can also use other CDN providers.
+
+unpkg​
+html
+<script src="//unpkg.com/@element-plus/icons-vue"></script>
+jsDelivr​
+html
+<script src="//cdn.jsdelivr.net/npm/@element-plus/icons-vue"></script>
+TIP
+
+We recommend using CDN to import Element Plus users to lock the version on the link address, so as not to be affected by incompatible updates when Element Plus is upgraded in the future. Please check unpkg.com for the method to lock the version.
+
+Auto Import​
+Use unplugin-icons and unplugin-auto-import to automatically import any icon collections from iconify. You can refer to this template.
+
+Simple Usage​
+WARNING
+
+Because HTML standard has already defined a tag named menu, so you need to use an alias in order to render the icon, if you register Menu directly it will not work.
+
+vue
+<!-- Use el-icon to provide attributes to SVG icon -->
+<template>
+  <div>
+    <el-icon :size="size" :color="color">
+      <Edit />
+    </el-icon>
+    <!-- Or use it independently without derive attributes from parent -->
+    <Edit />
+  </div>
+</template>
+Combined with el-icon​
+el-icon provides extra attributes for raw SVG icon, for more detail, please read to the end.
+
+vue
+<template>
+  <p>
+    with extra class <b>is-loading</b>, your icon is able to rotate 360 deg in 2
+    seconds, you can also override this
+  </p>
+  <el-icon :size="20">
+    <Edit />
+  </el-icon>
+  <el-icon color="#409efc" class="no-inherit">
+    <Share />
+  </el-icon>
+  <el-icon>
+    <Delete />
+  </el-icon>
+  <el-icon class="is-loading">
+    <Loading />
+  </el-icon>
+  <el-button type="primary">
+    <el-icon style="vertical-align: middle">
+      <Search />
+    </el-icon>
+    <span style="vertical-align: middle"> Search </span>
+  </el-button>
+</template>
+with extra class is-loading, your icon is able to rotate 360 deg in 2 seconds, you can also override this
+
+Using SVG icon directly​
+vue
+<template>
+  <div style="font-size: 20px">
+    <!-- Since svg icons do not carry any attributes by default -->
+    <!-- You need to provide attributes directly -->
+    <Edit style="width: 1em; height: 1em; margin-right: 8px" />
+    <Share style="width: 1em; height: 1em; margin-right: 8px" />
+    <Delete style="width: 1em; height: 1em; margin-right: 8px" />
+    <Search style="width: 1em; height: 1em; margin-right: 8px" />
+  </div>
+</template>
+Icon Collection​
+TIP
+
+You can use SVG icon in any version as long as you install it
+
+You can click the icon to copy it
+
+
+Copy SVG content
+Copy icon code
+Search Icons
+System
+Plus
+Minus
+CirclePlus
+Search
+Female
+Male
+Aim
+House
+FullScreen
+Loading
+Link
+Service
+Pointer
+Star
+Notification
+Connection
+ChatDotRound
+Setting
+Clock
+Position
+Discount
+Odometer
+ChatSquare
+ChatRound
+ChatLineRound
+ChatLineSquare
+ChatDotSquare
+View
+Hide
+Unlock
+Lock
+RefreshRight
+RefreshLeft
+Refresh
+Bell
+MuteNotification
+User
+Check
+CircleCheck
+Warning
+CircleClose
+Close
+PieChart
+More
+Compass
+Filter
+Switch
+Select
+SemiSelect
+CloseBold
+EditPen
+Edit
+Message
+MessageBox
+TurnOff
+Finished
+Delete
+Crop
+SwitchButton
+Operation
+Open
+Remove
+ZoomOut
+ZoomIn
+InfoFilled
+CircleCheckFilled
+SuccessFilled
+WarningFilled
+CircleCloseFilled
+QuestionFilled
+WarnTriangleFilled
+UserFilled
+MoreFilled
+Tools
+HomeFilled
+Menu
+UploadFilled
+Avatar
+HelpFilled
+Share
+StarFilled
+Comment
+Histogram
+Grid
+Promotion
+DeleteFilled
+RemoveFilled
+CirclePlusFilled
+Arrow
+ArrowLeft
+ArrowUp
+ArrowRight
+ArrowDown
+ArrowLeftBold
+ArrowUpBold
+ArrowRightBold
+ArrowDownBold
+DArrowRight
+DArrowLeft
+Download
+Upload
+Top
+Bottom
+Back
+Right
+TopRight
+TopLeft
+BottomRight
+BottomLeft
+Sort
+SortUp
+SortDown
+Rank
+CaretLeft
+CaretTop
+CaretRight
+CaretBottom
+DCaret
+Expand
+Fold
+Document
+DocumentAdd
+Document
+Notebook
+Tickets
+Memo
+Collection
+Postcard
+ScaleToOriginal
+SetUp
+DocumentDelete
+DocumentChecked
+DataBoard
+DataAnalysis
+CopyDocument
+FolderChecked
+Files
+Folder
+FolderDelete
+FolderRemove
+FolderOpened
+DocumentCopy
+DocumentRemove
+FolderAdd
+FirstAidKit
+Reading
+DataLine
+Management
+Checked
+Ticket
+Failed
+TrendCharts
+List
+Media
+Microphone
+Mute
+Mic
+VideoPause
+VideoCamera
+VideoPlay
+Headset
+Monitor
+Film
+Camera
+Picture
+PictureRounded
+Iphone
+Cellphone
+VideoCameraFilled
+PictureFilled
+Platform
+CameraFilled
+BellFilled
+Traffic
+Location
+LocationInformation
+DeleteLocation
+Coordinate
+Bicycle
+OfficeBuilding
+School
+Guide
+AddLocation
+MapLocation
+Place
+LocationFilled
+Van
+Food
+Watermelon
+Pear
+NoSmoking
+Smoking
+Mug
+GobletSquareFull
+GobletFull
+KnifeFork
+Sugar
+Bowl
+MilkTea
+Lollipop
+Coffee
+Chicken
+Dish
+IceTea
+ColdDrink
+CoffeeCup
+DishDot
+IceDrink
+IceCream
+Dessert
+IceCreamSquare
+ForkSpoon
+IceCreamRound
+Food
+HotWater
+Grape
+Fries
+Apple
+Burger
+Goblet
+GobletSquare
+Orange
+Cherry
+Items
+Printer
+Calendar
+CreditCard
+Box
+Money
+Refrigerator
+Cpu
+Football
+Brush
+Suitcase
+SuitcaseLine
+Umbrella
+AlarmClock
+Medal
+GoldMedal
+Present
+Mouse
+Watch
+QuartzWatch
+Magnet
+Help
+Soccer
+ToiletPaper
+ReadingLamp
+Paperclip
+MagicStick
+Basketball
+Baseball
+Coin
+Goods
+Sell
+SoldOut
+Key
+ShoppingCart
+ShoppingCartFull
+ShoppingTrolley
+Phone
+Scissor
+Handbag
+ShoppingBag
+Trophy
+TrophyBase
+Stopwatch
+Timer
+CollectionTag
+TakeawayBox
+PriceTag
+Wallet
+Opportunity
+PhoneFilled
+WalletFilled
+GoodsFilled
+Flag
+BrushFilled
+Briefcase
+Stamp
+Weather
+Sunrise
+Sunny
+Ship
+MostlyCloudy
+PartlyCloudy
+Sunset
+Drizzling
+Pouring
+Cloudy
+Moon
+MoonNight
+Lightning
+Other
+ChromeFilled
+Eleme
+ElemeFilled
+ElementPlus
+Shop
+SwitchFilled
+WindPower

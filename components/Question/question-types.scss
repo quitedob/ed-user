@@ -1,0 +1,274 @@
+// 题目类型公共样式
+.question-content {
+  .question-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #303133;
+    margin-bottom: 24px;
+  }
+
+  .options {
+    :deep(.el-radio-group),
+    :deep(.el-checkbox-group) {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    :deep(.el-radio),
+    :deep(.el-checkbox) {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      margin: 0;
+      border: 2px solid #e4e7ed;
+      border-radius: 8px;
+      transition: all 0.2s;
+      height: auto;
+      white-space: normal;
+
+      &:hover { border-color: #409eff; background: #f5f7fa; }
+      &.is-checked { border-color: #409eff; background: #ecf5ff; }
+    }
+
+    :deep(.el-radio__label),
+    :deep(.el-checkbox__label) {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      white-space: normal;
+    }
+
+    .option-label {
+      font-weight: 600;
+      color: #409eff;
+      margin-right: 8px;
+      min-width: 20px;
+    }
+
+    .option-text {
+      flex: 1;
+      color: #303133;
+      line-height: 1.6;
+    }
+
+    &.judge-options {
+      :deep(.el-radio-group) { flex-direction: row; gap: 24px; }
+      .judge-item {
+        flex: 1;
+        justify-content: center;
+        .judge-icon {
+          font-size: 24px;
+          margin-right: 8px;
+          &.correct-icon { color: #67c23a; }
+          &.wrong-icon { color: #f56c6c; }
+        }
+      }
+    }
+  }
+
+  .answer-display {
+    .answer-section {
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f5f7fa;
+      border-radius: 8px;
+      border: 1px solid #e4e7ed;
+
+      .section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #606266;
+        margin-bottom: 8px;
+        &.correct { color: #67c23a; }
+      }
+
+      .answer-value {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #303133;
+        &.correct { color: #67c23a; }
+        &.wrong { color: #f56c6c; }
+        .wrong-icon { margin-left: 8px; }
+      }
+    }
+
+    .explanation {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #fdf6ec;
+      border-radius: 8px;
+      color: #e6a23c;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  }
+
+  .fill-input, .essay-input {
+    :deep(.el-textarea__inner) {
+      font-size: 15px;
+      line-height: 1.8;
+      border-radius: 8px;
+    }
+  }
+}
+
+// OJ题目样式
+.oj-description {
+  .oj-title { font-size: 20px; font-weight: 600; color: #303133; margin-bottom: 16px; }
+
+  .oj-meta-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    .meta-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      &.time { background: #ecf5ff; color: #409eff; }
+      &.memory { background: #f0f9eb; color: #67c23a; }
+      &.difficulty { background: #fdf6ec; color: #e6a23c; }
+    }
+  }
+
+  .oj-tags-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .oj-section {
+    margin-bottom: 20px;
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #409eff;
+      display: inline-block;
+    }
+    .section-content { color: #606266; line-height: 1.8; }
+  }
+
+  .example-box {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+
+    .example-title { font-weight: 600; color: #303133; margin-bottom: 12px; }
+    .example-group {
+      display: flex;
+      gap: 16px;
+      .example-item {
+        flex: 1;
+        .example-label { font-size: 13px; color: #909399; margin-bottom: 6px; }
+        .example-code {
+          background: white;
+          padding: 12px;
+          border-radius: 6px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          font-size: 13px;
+          margin: 0;
+          border: 1px solid #e4e7ed;
+          white-space: pre-wrap;
+        }
+      }
+    }
+  }
+}
+
+.question-oj {
+  .oj-editor-panel {
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      .editor-title { font-weight: 600; color: #303133; font-size: 15px; }
+    }
+    .code-textarea {
+      :deep(.el-textarea__inner) {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        border-radius: 8px;
+      }
+    }
+    .editor-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+    }
+  }
+
+  .oj-result {
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      .result-status {
+        padding: 8px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        &.accepted { background: #f0f9eb; color: #67c23a; }
+        &.rejected { background: #fef0f0; color: #f56c6c; }
+        &.pending { background: #f5f7fa; color: #909399; }
+      }
+      .result-score { font-size: 14px; color: #606266; }
+    }
+
+    .test-cases {
+      h4 { margin-bottom: 12px; color: #303133; }
+      .test-case-item {
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        &.passed { background: #f0f9eb; border: 1px solid #c2e7b0; }
+        &.failed { background: #fef0f0; border: 1px solid #fbc4c4; }
+        .test-case-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+          font-weight: 600;
+          .status-icon { &.passed { color: #67c23a; } &.failed { color: #f56c6c; } }
+        }
+        .io-block {
+          margin-bottom: 8px;
+          .io-label { font-size: 13px; color: #909399; margin-bottom: 4px; }
+          pre { background: white; padding: 8px; border-radius: 4px; font-size: 13px; margin: 0; }
+        }
+      }
+    }
+
+    .submitted-code {
+      margin-top: 20px;
+      h4 { margin-bottom: 12px; color: #303133; }
+      .code-display {
+        background: #f5f7fa;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 13px;
+        overflow-x: auto;
+      }
+    }
+  }
+}
